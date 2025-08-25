@@ -587,15 +587,15 @@
     "Neon pulses shape new worlds.",
     "Silent waves crash on pixel shores."
   ];
-  let quoteIndex = 0;
   const quoteDisplay = document.getElementById('quote-display');
 
-  function showNextQuote() {
-    quoteDisplay.textContent = quotesList[quoteIndex];
-    quoteIndex = (quoteIndex + 1) % quotesList.length;
-  }
-  showNextQuote();
-  setInterval(showNextQuote, 4000);
+function showRandomQuote() {
+  const randomIndex = Math.floor(Math.random() * quotesList.length);
+  quoteDisplay.textContent = quotesList[randomIndex];
+}
+
+showRandomQuote();
+setInterval(showRandomQuote, 4000);
 
   // --- FALLING SYMBOLS: STARS, BLOOD DROPS, FANCY SYMBOLS ---
   const fallingSymbolsContainer = document.querySelector('.fallingSymbols');
