@@ -78,18 +78,7 @@
     0%, 100% {opacity: 1;}
     50% {opacity: 0;}
   }
-    #matrixCanvas::after {
-  content: "Tap the screen";
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: rgba(255, 0, 255, 0.5); /* semi-transparent */
-  font-size: 30px;
-  font-family: monospace;
-  pointer-events: none; /* nu blochează click-ul */
-  z-index: 9998;
-}
+   
   /* MAIN CONTAINER */
   #mainContent {
     display: none;
@@ -99,7 +88,11 @@
     -webkit-overflow-scrolling: touch;
     position: relative;
   }
-
+#matrixCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 9999; /* sub startScreen */
+}
   /* STARS ANIMATION (background) */
   #stars {
     position: fixed;
