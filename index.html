@@ -92,8 +92,7 @@
 #matrixCanvas {
   position: fixed;
   inset: 0;
-  z-index: 9998; /* sub startScreen */
-  background: transparent;
+  z-index: 9997; /* sub startScreen */
 }
   /* STARS ANIMATION (background) */
   #stars {
@@ -400,7 +399,6 @@
 
 <!-- START SCREEN -->
 <div id="startScreen" tabindex="0" aria-label="Ecran de start">
-  <div>  </div>
   <span id="musicText">🎵Tap The Screen🎵</span>
   <canvas id="matrixCanvas"></canvas>
 </div>
@@ -418,9 +416,34 @@
     <p id="quote-display"></p>
   </section>
 
-  <section id="videoContainer">
-    <video id="riskVideo" playsinline loop muted preload="auto" src="risk.mp4"></video>
-  </section>
+<section id="videoContainer">
+  <video id="riskVideo" playsinline loop muted preload="auto" src="risk.mp4"></video>
+</section>
+
+<script>
+  const video = document.getElementById('riskVideo');
+
+  function restartVideo() {
+    try {
+      video.currentTime = 0; // pune la început
+      video.play();          // repornește
+    } catch (e) {
+      console.warn('Nu s-a putut reporni video-ul:', e);
+    }
+  }
+
+  // Când pagina devine vizibilă (revine în foreground)
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      restartVideo();
+    }
+  });
+
+  // Fallback pentru WebView-uri care nu declanșează visibilitychange
+  window.addEventListener('focus', () => {
+    restartVideo();
+  });
+</script>
 
   <section id="socialsSection">
     <h2>My Socials</h2>
