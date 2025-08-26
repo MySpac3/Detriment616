@@ -66,14 +66,16 @@
     color: #ff00ff;
     letter-spacing: 1.8px;
   }
-  #startScreen span {
-    margin-top: 20px;
-    font-size: 14px;
-    color: #0ff;
-    animation: blink 1.5s linear infinite;
-    opacity: 1;
-    transition: opacity 0.5s ease;
-  }
+ #startScreen span {
+  position: fixed; /* îl scoatem din fluxul normal */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(255, 0, 255, 0.7); /* semi-transparent */
+  font-size: 20px;
+  pointer-events: none; /* nu blochează click */
+  z-index: 9999; /* peste canvas #matrixCanvas */
+}
   @keyframes blink {
     0%, 100% {opacity: 1;}
     50% {opacity: 0;}
