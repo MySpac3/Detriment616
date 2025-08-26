@@ -79,12 +79,19 @@
     50% {opacity: 0;}
   }
 
-  /* MATRIX RAIN CANVAS IN START SCREEN */
-  #matrixCanvas {
-    position: fixed;
-    inset: 0;
-    z-index: 9998;
-  }
+ /* MATRIX RAIN CANVAS IN START SCREEN */
+#matrixCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  opacity: 0; /* ascuns la început */
+  animation: fadeIn 0.01s linear 2s forwards; /* 2s delay */
+}
+
+/* Animația fade-in pentru întârziere */
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
 
   /* MAIN CONTAINER */
   #mainContent {
