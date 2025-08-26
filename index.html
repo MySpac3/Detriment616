@@ -83,6 +83,17 @@
   inset: 0;
   z-index: 9997; /* sub startScreen */
 }
+    #tapMessage {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(255, 0, 255, 0.5); /* semi-transparent */
+  font-size: 30px;
+  font-family: monospace;
+  pointer-events: none; /* ca să nu blocheze click-ul */
+  z-index: 9998; /* peste canvas, sub startScreen dacă există */
+}
   /* MAIN CONTAINER */
   #mainContent {
     display: none;
