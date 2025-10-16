@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detriment616 - DancingGoths</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+<style>
+body {
+  background: #070006;
+  font-family: 'Orbitron', monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* VIDEO CONTAINER */
+#videoContainer {
+  position: relative;
+  width: 90vw;
+  max-width: 900px;
+  aspect-ratio: 16/9;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 0 40px #ff0000, inset 0 0 50px #00ff00;
+}
+
+#videoContainer video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* LYRICS OVERLAY */
+#lyricsOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* nu blochează click pe video */
+  overflow: hidden;
+}
+
+.lyric {
+  position: absolute;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff0000;
+  text-shadow: 0 0 6px #ff0000, 0 0 6px #00ff00;
+  opacity: 0;
+  transition: opacity 0.3s;
+  user-select: none;
+}
+
+/* FALLING SYMBOLS */
+.symbol {
+  position: absolute;
+  font-size: 14px;
+  font-weight: bold;
+  color: #00ff00;
+  opacity: 0.7;
+  user-select: none;
+  pointer-events: none;
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity:0.7; }
+  100% { transform: translateY(100%); opacity:0; }
+}
+
+</style>
+</head>
+<body>
+
+<div id="videoContainer">
+  <video id="mainVideo" src="d.mov" loop muted></video>
+  <div id="lyricsOverlay"></div>
+</div>
+
+<script>
+const video = document.getElementById('mainVideo');
+const overlay = document.getElementById('lyricsOverlay');
+
+const lyrics = [
+  "What am I supposed to do?",
+  "Should I sit, wait for you?",
+  "Listen to me screaming more",
+  "Tell me now just what am I supposed to do?",
+  "Should I sit, wait for you?",
+  "Listen to me screaming more"
+];
+
+// PLAY VIDEO ON FIRST TAP
+let started = false;
+document.getElementById('videoContainer').addEventListener('click', e => {
+  if(!started){
+    video.muted = false;
+    video.play();
+    started = true;
+  }
+  showLyric(e.clientX, e.clientY);
+});
+
+// SHOW LYRIC AT CLICK POSITION
+let lyricIndex = 0;
+function showLyric(x, y){
+  const span = document.createElement('span');
+  span.className = 'lyric';
+  span.style.left = x - overlay.getBoundingClientRect().left + 'px';
+  span.style.top = y - overlay.getBoundingClientRect().top + 'px';
+  span.textContent = lyrics[lyricIndex];
+  overlay.appendChild(span);
+  requestAnimationFrame(() => { span.style.opacity = 1; });
+  setTimeout(() => { span.remove(); }, 900);
+
+  lyricIndex = (lyricIndex + 1) % lyrics.length;
+}
+
+// CREATE FALLING SYMBOLS
+const symbols = ['▲','▼','◆','◉','●','■','♠','♥'];
+function createSymbol(){
+  const s = document.createElement('div');
+  s.className = 'symbol';
+  s.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+  s.style.left = Math.random()*overlay.offsetWidth + 'px';
+  s.style.top = '-20px';
+  s.style.fontSize = (12+Math.random()*12)+'px';
+  s.style.animationDuration = (3+Math.random()*5)+'s';
+  overlay.appendChild(s);
+  s.addEventListener('animationend', () => s.remove());
+}
+
+// CONTINUOUS SYMBOLS
+setInterval(createSymbol, 200);
+</script>
+
+</body>
+</html>
