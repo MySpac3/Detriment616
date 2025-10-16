@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <title>Detriment616 / DancingGoths</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+  /* Reset */
+  * {margin:0; padding:0; box-sizing:border-box;}
+  html, body {height:100%; background:#070006; font-family:'Press Start 2P', monospace; overflow-x:hidden; color:#fff;
+    box-shadow:0 0 12px 2px #8b0000, inset 0 0 30px 5px #ff0000; animation:bloodGlow 3s ease-in-out infinite alternate;}
+  @keyframes bloodGlow {0%{box-shadow:0 0 8px 1.5px #7a0000,inset 0 0 20px 4px #cc0000;}100%{box-shadow:0 0 20px 3px #ff0000,inset 0 0 40px 6px #ff3300;}}
+
+  /* START SCREEN */
+  #startScreen{position:fixed;inset:0;background:linear-gradient(135deg,#2a0033,#000);z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;color:#ff00ff;font-size:20px;cursor:pointer;user-select:none;}
+  #startScreen div{font-weight:900;-webkit-text-stroke:1.2px #ff00ff;color:#ff00ff;letter-spacing:1.8px;}
+  #startScreen span{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);color:rgba(255,0,255,0.7);font-size:20px;pointer-events:none;z-index:9999;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+  /* MAIN CONTAINER */
+  #mainContent{display:none; min-height:100vh; background:linear-gradient(180deg,#1a001a 0%,#000 100%); overflow-y:auto; -webkit-overflow-scrolling:touch; position:relative;}
+  #matrixCanvas{position:fixed;inset:0; z-index:9998; background:transparent;}
+
+  /* STARS */
+  #stars{position:fixed;inset:0;pointer-events:none; background:radial-gradient(white 1px,transparent 1px) 0 0 / 3px 3px repeat, radial-gradient(white 1px,transparent 1px) 1.5px 1.5px / 3px 3px repeat; animation:starMove 40s linear infinite; opacity:0.15; z-index:0;}
+  @keyframes starMove{from{background-position:0 0,1.5px 1.5px;}to{background-position:100px 100px,101.5px 101.5px;}}
+
+  /* HEADER & FOOTER */
+  header, footer{position:sticky;background:rgba(0,0,0,0.7);text-align:center;padding:15px 10px;border-top:2px dashed #ff00ff;border-bottom:2px dashed #00ffff; z-index:10;}
+  header h1{color:#ff00ff;font-size:22px;font-weight:900;-webkit-text-stroke:1.6px #ff00ff;letter-spacing:2px;animation:glitch 2.5s infinite;}
+  @keyframes glitch{0%{text-shadow:2px 0 #ff00ff,-2px 0 #00ffff;}20%{text-shadow:-2px 0 #ff00ff,2px 0 #00ffff;}40%{text-shadow:2px 0 #ff00ff,-2px 0 #00ffff;}60%{text-shadow:-2px 0 #ff00ff,2px 0 #00ffff;}80%{text-shadow:2px 0 #ff00ff,-2px 0 #00ffff;}100%{text-shadow:-2px 0 #ff00ff,2px 0 #00ffff;}}
+  footer p{color:#00ffff;font-size:12px;font-style:italic;text-shadow:0 0 8px #00ffff;}
+
+  /* QUOTES */
+  #quotesSection{margin:20px auto 10px;width:90%;max-width:480px;background:rgba(50,0,50,0.6);border:2px solid #ff00ff;border-radius:12px;padding:20px;text-align:center;font-size:16px;color:#ff99ff;font-weight:bold;letter-spacing:1.5px;animation:glitchColors 6s linear infinite;min-height:80px;user-select:none;}
+  @keyframes glitchColors{0%{color:#ff99ff;}25%{color:#00ffff;}50%{color:#ffcc00;}75%{color:#ff66cc;}100%{color:#ff99ff;}}
+
+  /* VIDEO */
+  #videoContainer{max-width:100vw;width:100%;aspect-ratio:16/9;margin:0 auto 30px;box-shadow:0 0 25px #ff00ff,0 0 50px #00ffff inset;border-radius:16px;overflow:hidden;position:relative;background:black;z-index:5;animation:pulseGlow 4s ease-in-out infinite;}
+  @keyframes pulseGlow{0%,100%{box-shadow:0 0 25px #ff00ff,0 0 50px #00ffff inset;}50%{box-shadow:0 0 40px #ff66ff,0 0 70px #33ffff inset;}}
+  #videoContainer video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;}
+
+  /* SOCIALS / VERSURI */
+  #socialsSection{max-width:480px;margin:0 auto 40px;background:rgba(20,0,20,0.8);border:2px dashed #00ffff;padding:15px 10px;border-radius:12px;text-align:center;z-index:5;position:relative;}
+  #socialsSection h2{font-size:18px;margin-bottom:15px;color:#00ffff;text-shadow:0 0 8px #ff00ff;}
+  #socialsSection .links{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;min-height:40px;overflow:hidden;}
+  #socialsSection .links span{font-size:16px;font-weight:bold;}
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-track{background:#220022;}
+  ::-webkit-scrollbar-thumb{background:#ff00ff;border-radius:10px;}
+
+  /* FALLING SYMBOLS */
+  .fallingSymbols{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;overflow:visible;z-index:1000;}
+  .fallingStar,.bloodDrop,.fancySymbol{position:absolute;opacity:0.7;}
+  .bloodDrop{width:6px;height:10px;background:linear-gradient(180deg,#8b0000 0%,#ff0000 100%);border-radius:50%/60%;filter:drop-shadow(0 0 6px #ff0000);opacity:0.8;}
+  .star1{width:3px;height:3px;background:radial-gradient(circle,#fff 0%,#ff00ff 70%);border-radius:50%;}
+  .star2{width:6px;height:2px;background:linear-gradient(90deg,#ff66ff,#00ffff);border-radius:2px;}
+  .star3{width:4px;height:4px;background:linear-gradient(45deg,#ff00ff,#ff99ff),linear-gradient(-45deg,#ff00ff,#00ffff);clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);}
+  .star4{width:5px;height:5px;background:white;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);filter:drop-shadow(0 0 4px #00ffff);}
+  .star5{width:8px;height:1.5px;background:linear-gradient(90deg,#ff00ff,#00ffff);border-radius:3px;}
+  .fancySymbol{will-change:transform,opacity;pointer-events:none;user-select:none;filter:drop-shadow(0 0 5px #ff00ff) drop-shadow(0 0 5px #00ffff);}
+  @keyframes fallStar{0%{transform:translateY(-60px) rotate(20deg);opacity:0.8;}100%{transform:translateY(110vh) rotate(20deg);opacity:0;}}
+  @keyframes fallBlood{0%{transform:translateY(-40px) rotate(0deg);opacity:0.9;}100%{transform:translateY(110vh) rotate(10deg);opacity:0;}}
+  </style>
+</head>
+<body>
+<div id="startScreen" tabindex="0" aria-label="Ecran de start">
+  <div></div>
+  <span id="musicText">🎵 Tap The Screen 🎵</span>
+  <canvas id="matrixCanvas"></canvas>
+</div>
+
+<div id="mainContent" tabindex="0" aria-label="Pagina principală">
+  <div id="stars"></div>
+  <header><h1>Detriment616 MySpace</h1></header>
+  <section id="quotesSection" aria-live="polite" aria-atomic="true" aria-relevant="additions">
+    <p id="quote-display"></p>
+  </section>
+
+  <section id="videoContainer">
+    <video id="riskVideo" playsinline loop muted preload="auto" src="d.mov"></video>
+  </section>
+
+  <section id="socialsSection">
+    <h2>Versuri</h2>
+    <div class="links" role="navigation" aria-label="Versuri"></div>
+  </section>
+
+  <div class="fallingSymbols" aria-hidden="true"></div>
+  <footer><p>© 2025 Detriment616</p></footer>
+</div>
+
+<script>
+  // --- START SCREEN + MATRIX RAIN ---
+  const startScreen = document.getElementById('startScreen');
+  const mainContent = document.getElementById('mainContent');
+  const video = document.getElementById('riskVideo');
+  const matrixCanvas = document.getElementById('matrixCanvas');
+  const ctx = matrixCanvas.getContext('2d');
+  const musicText = document.getElementById('musicText');
+
+  function resizeCanvas(){matrixCanvas.width=window.innerWidth;matrixCanvas.height=window.innerHeight;}
+  resizeCanvas(); window.addEventListener('resize',resizeCanvas);
+
+  const letters="ã¢ã¤ã¦ã¨ãªã«ã­ã¯ã±ã³ãµã·ã¹ã»ã½ã¿ãã¤ããããããããããããã ã¡ã¢ã¤ã¦ã¨ã©ãªã«ã¬ã­ã¯ã³0123456789Detriment616â£ï¸DETRIMENT616";
+  const fontSize=16;
+  const columns=Math.floor(matrixCanvas.width/fontSize);
+  const drops=Array(columns).fill(1);
+
+  function drawMatrix(){
+    ctx.fillStyle="rgba(0,0,0,0.1)";
+    ctx.fillRect(0,0,matrixCanvas.width,matrixCanvas.height);
+    ctx.fillStyle="#0ff";
+    ctx.font=fontSize+"px monospace";
+    for(let i=0;i<drops.length;i++){
+      const text=letters.charAt(Math.floor(Math.random()*letters.length));
+      ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+      if(drops[i]*fontSize>matrixCanvas.height && Math.random()>0.975) drops[i]=0;
+      drops[i]++;
+    }
+  }
+  let matrixInterval=setInterval(drawMatrix,50);
+
+  startScreen.addEventListener('click',()=>{
+    startScreen.querySelector('div').textContent="Apasă pe ecran";
+    musicText.style.opacity='0';
+    setTimeout(()=>{
+      startScreen.style.display='none';
+      mainContent.style.display='block';
+      clearInterval(matrixInterval);
+      video.muted=false;
+      video.play();
+    },500);
+  });
+
+  // --- QUOTES ---
+  const quotesList=["Synth waves pulse through the night.","Digital echoes in neon dreams.","Static hums beneath quiet code.","I love Aphex Twin !","Noise is the purest confession.","I write lullabies for machines.","Silence is louder than you think.","I erase myself to hear the sound clearer.","Dreams are remixes of forgotten fears.","The best melodies come from broken circuits."];
+  const quoteDisplay=document.getElementById('quote-display');
+  function showRandomQuote(){const i=Math.floor(Math.random()*quotesList.length); quoteDisplay.textContent=quotesList[i];}
+  showRandomQuote(); setInterval(showRandomQuote,4000);
+
+  // --- FALLING SYMBOLS ---
+  const fallingSymbolsContainer=document.querySelector('.fallingSymbols');
+  const starTypes=['star1','star2','star3','star4','star5'];
+  const starCount=40,bloodCount=25;
+  const fancySymbols=['Ë','â','ï½¡','ð¦¹','â§','â­','â','â¶','â£ï¸','ð'];
+
+  function createFallingStar(){const star=document.createElement('div');star.classList.add('fallingStar',starTypes[Math.floor(Math.random()*starTypes.length)]);star.style.left=Math.random()*100+'vw';star.style.animationDuration=(5+Math.random()*7)+'s';star.style.animationDelay=(Math.random()*10)+'s';star.style.top='-50px';fallingSymbolsContainer.appendChild(star); star.addEventListener('animationend',()=>{fallingSymbolsContainer.removeChild(star);createFallingStar();});}
+  function createBloodDrop(){const drop=document.createElement('div');drop.classList.add('fallingStar','bloodDrop');drop.style.left=Math.random()*100+'vw';drop.style.animationDuration=(6+Math.random()*5)+'s';drop.style.animationDelay=(Math.random()*10)+'s';drop.style.top='-40px';fallingSymbolsContainer.appendChild(drop); drop.addEventListener('animationend',()=>{fallingSymbolsContainer.removeChild(drop);createBloodDrop();});}
+  function createFancySymbol(){const symEl=document.createElement('div');symEl.classList.add('fallingStar','fancySymbol');symEl.textContent=fancySymbols[Math.floor(Math.random()*fancySymbols.length)];symEl.style.fontSize=(12+Math.random()*12)+'px';symEl.style.color=`hsl(${Math.random()*360},80%,70%)`;symEl.style.left=Math.random()*100+'vw';symEl.style.animationDuration=(4+Math.random()*8)+'s';symEl.style.animationDelay=(Math.random()*10)+'s';symEl.style.top='-40px';fallingSymbolsContainer.appendChild(symEl); symEl.addEventListener('animationend',()=>{fallingSymbolsContainer.removeChild(symEl);createFancySymbol();});}
+
+  for(let i=0;i<starCount;i++) createFallingStar();
+  for(let i=0;i<bloodCount;i++) createBloodDrop();
+  for(let i=0;i<60;i++) createFancySymbol();
+
+  // --- TAP SHOW LYRICS ---
+  const words=[
+    "What","am","I","supposed","to","do?",
+    "Should","I","sit,","wait","for","you?",
+    "Listen","to","me","screaming","more",
+    "Tell","me","now","just","what","am","I","supposed","to","do?",
+    "Should","I","sit,","wait","for","you?",
+    "Listen","to","me","screaming","more"
+  ];
+  const lyricsContainer=document.querySelector('#socialsSection .links');
+  let idx=0;
+  document.body.addEventListener('click',()=>{
+    if(idx>=words.length) return;
+    const span=document.createElement('span');
+    span.textContent=words[idx++];
+    span.style.color=(idx%2===0)?'red':'green';
+    span.style.marginRight='6px';
+    lyricsContainer.appendChild(span);
+    lyricsContainer.scrollTop=lyricsContainer.scrollHeight;
+  });
+</script>
+</body>
+</html>
