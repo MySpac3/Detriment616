@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<title>Dancing Goths</title>
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background: black;
+    font-family: 'Papyrus', 'Comic Sans MS', cursive; /* font fancy */
+    position: relative;
+}
+video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* păstrează proporțiile */
+}
+#textOverlay {
+    position: absolute;
+    font-size: 2em;
+    font-weight: bold;
+    pointer-events: none;
+}
+#tapMessage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 2em;
+    font-family: 'Papyrus', 'Comic Sans MS', cursive;
+    text-align: center;
+    cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<video id="myVideo" muted loop>
+    <source src="d.mov" type="video/quicktime">
+    Browserul tău nu suportă video-ul.
+</video>
+
+<div id="tapMessage">Tap the screen to start</div>
+<div id="textOverlay"></div>
+
+<script>
+const text = `What am I supposed to do? Should I sit, wait for you? Listen to me screaming more Tell me now just what am I supposed to do? Should I sit, wait for you? Listen to me screaming more`;
+const words = text.split(' ');
+let index = 0;
+
+const video = document.getElementById('myVideo');
+const overlay = document.getElementById('textOverlay');
+const tapMessage = document.getElementById('tapMessage');
+
+function randomColor() {
+    const colors = ['#FF0000','#00FF00','#0000FF','#FFFF00','#FF00FF','#00FFFF','#FFA500','#FF69B4','#ADFF2F','#8A2BE2'];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+// Primul click pentru autoplay video
+tapMessage.addEventListener('click', () => {
+    video.play();
+    tapMessage.style.display = 'none';
+});
+
+// Click oriunde pentru text
+document.body.addEventListener('click', (e) => {
+    // dacă încă este mesajul de tap, ignorăm
+    if(tapMessage.style.display !== 'none') return;
+
+    if(index >= words.length) return;
+
+    overlay.textContent = words[index];
+    overlay.style.color = randomColor();
+    index++;
+
+    // poziția textului unde ai apăsat
+    overlay.style.left = e.clientX + 'px';
+    overlay.style.top = e.clientY + 'px';
+    overlay.style.opacity = 1;
+
+    setTimeout(() => {
+        overlay.style.opacity = 0;
+    }, 900);
+});
+</script>
+
+</body>
+</html>
