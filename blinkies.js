@@ -24,7 +24,7 @@ document.getElementById("socialsSection").insertAdjacentElement("afterend", sect
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
-// 🔥 CREATE BLINKIE ELEMENT (FAST + LAZY LOADING)
+// 🔥 CREATE BLINKIE ELEMENT (LAZY LOADING)
 // =======================
 function createBlinkie(src) {
   const el = document.createElement("div");
@@ -72,7 +72,7 @@ fileNames.forEach(name => {
 });
 
 // =======================
-// 🔥 LAZY LOADING
+// 🔥 LAZY LOADING OBSERVER (SCROLL MAI PUȚIN SENSIBIL)
 // =======================
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
@@ -99,43 +99,33 @@ const observer = new IntersectionObserver((entries) => {
       observer.unobserve(img);
     }
   });
-}, { rootMargin: "200px" });
+}, { rootMargin: "50px" }); // mai mic decât 200px => scroll mai puțin sensibil
 
 blinkies.forEach(el => observer.observe(el.querySelector('img')));
 
 // =======================
-// 🔥 FLASHING TEXT "Blinkies"
+// 🔥 FLASHING TEXT (MINIM)
 // =======================
 const title = section.querySelector("h2");
 const text = title.textContent;
 title.textContent = "";
-const lettersArray = [];
 
 for (let char of text) {
   const span = document.createElement("span");
   span.textContent = char;
   title.appendChild(span);
-  lettersArray.push(span);
-}
-
-function randomColor() {
-  const r = Math.floor(Math.random() * 256);
-  const g = Math.floor(Math.random() * 256);
-  const b = Math.floor(Math.random() * 256);
-  return `rgb(${r},${g},${b})`;
 }
 
 function flashText() {
-  lettersArray.forEach(span => {
-    if (Math.random() < 0.3) span.style.color = randomColor();
+  title.querySelectorAll('span').forEach(span => {
+    if (Math.random() < 0.3) span.style.color = `rgb(${Math.random()*255|0},${Math.random()*255|0},${Math.random()*255|0})`;
   });
   requestAnimationFrame(flashText);
 }
-
 flashText();
 
 // =======================
-// 🔥 MEDIA QUERY PENTRU TELEFON
+// 🔥 MEDIA QUERY MOBILE
 // =======================
 const style = document.createElement("style");
 style.textContent = `
