@@ -20,8 +20,7 @@ section.innerHTML = `
 "></div>
 `;
 
-const socials = document.getElementById("socialsSection");
-socials.insertAdjacentElement("afterend", section);
+document.getElementById("socialsSection").insertAdjacentElement("afterend", section);
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
@@ -35,13 +34,12 @@ function createBlinkie(src) {
   el.style.width = "100%";
 
   const img = document.createElement("img");
-  img.dataset.src = src; // folosim data-src pentru lazy loading
+  img.dataset.src = src;
   img.style.width = "100%";
   img.style.height = "auto";
   img.style.objectFit = "contain";
   img.style.maxWidth = "180px";
   img.style.maxHeight = "180px";
-
   img.onerror = () => el.remove();
 
   el.appendChild(img);
@@ -49,7 +47,7 @@ function createBlinkie(src) {
 }
 
 // =======================
-// 🔥 GENERATE RANDOMIZED BLINKIES
+// 🔥 GENERATE FILE NAMES + RANDOMIZE
 // =======================
 const blinkies = [];
 const fileNames = [];
@@ -60,13 +58,13 @@ for (let base = 1; base <= 6; base++) {
   }
 }
 
-// Shuffle array aleator
+// Shuffle
 for (let i = fileNames.length - 1; i > 0; i--) {
   const j = Math.floor(Math.random() * (i + 1));
   [fileNames[i], fileNames[j]] = [fileNames[j], fileNames[i]];
 }
 
-// Creăm și adăugăm blinkies
+// Add blinkies
 fileNames.forEach(name => {
   const el = createBlinkie(name);
   container.appendChild(el);
@@ -74,7 +72,7 @@ fileNames.forEach(name => {
 });
 
 // =======================
-// 🔥 OBSERVER PENTRU LAZY LOADING
+// 🔥 LAZY LOADING OBSERVER (SCROLL MAI PUȚIN SENSIBIL)
 // =======================
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
@@ -86,15 +84,14 @@ const observer = new IntersectionObserver((entries) => {
           const aspect = img.naturalWidth / img.naturalHeight;
           const el = img.parentElement;
 
-          if (window.innerWidth > 600) { 
-            // Desktop
+          if (window.innerWidth > 600) {
             if (aspect > 1.5) el.style.gridColumn = "span 4";
             else if (aspect > 1.2) el.style.gridColumn = "span 2";
             else el.style.gridColumn = "span 1";
           } else {
-            // Mobil
-            if (aspect > 1.2) el.style.gridColumn = "span 2";
-            else el.style.gridColumn = "span 1";
+            if (window.innerWidth < 400) el.style.gridColumn = "span 2";
+            else if (window.innerWidth < 800) el.style.gridColumn = "span 3";
+            else el.style.gridColumn = "span 4";
           }
         };
         img.removeAttribute('data-src');
@@ -102,54 +99,39 @@ const observer = new IntersectionObserver((entries) => {
       observer.unobserve(img);
     }
   });
-}, {
-  rootMargin: "5px" // încărcăm puțin înainte să apară în viewport
-});
+}, { rootMargin: "5px" }); // mai mic decât 200px => scroll mai puțin sensibil
 
 blinkies.forEach(el => observer.observe(el.querySelector('img')));
 
 // =======================
-// 🔥 MULTICOLOR FLASHING TEXT "Blinkies"
+// 🔥 FLASHING TEXT (MINIM)
 // =======================
 const title = section.querySelector("h2");
 const text = title.textContent;
 title.textContent = "";
-const lettersArray = [];
 
 for (let char of text) {
   const span = document.createElement("span");
   span.textContent = char;
   title.appendChild(span);
-  lettersArray.push(span);
-}
-
-function randomColor() {
-  const r = Math.floor(Math.random() * 256);
-  const g = Math.floor(Math.random() * 256);
-  const b = Math.floor(Math.random() * 256);
-  return `rgb(${r},${g},${b})`;
 }
 
 function flashText() {
-  lettersArray.forEach(span => {
-    if (Math.random() < 0.3) {
-      span.style.color = randomColor();
-      span.style.opacity = Math.random() < 0.5 ? "0.2" : "1";
-    }
+  title.querySelectorAll('span').forEach(span => {
+    if (Math.random() < 0.3) span.style.color = `rgb(${Math.random()*255|0},${Math.random()*255|0},${Math.random()*255|0})`;
   });
   requestAnimationFrame(flashText);
 }
-
 flashText();
 
 // =======================
-// 🔥 MEDIA QUERY PENTRU TELEFON
+// 🔥 MEDIA QUERY MOBILE
 // =======================
 const style = document.createElement("style");
 style.textContent = `
 @media (max-width: 600px) {
   #blinkiesContainer {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
     gap: 1px;
   }
 }
