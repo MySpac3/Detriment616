@@ -21,33 +21,35 @@ const style = document.createElement("style");
 style.textContent = `
 #blinkiesContainer {
   display: grid;
-  grid-template-columns: repeat(3, 100px);
+  grid-template-columns: repeat(3, 100px); /* MAX 3 pe rând */
   justify-content: center;
   gap: 4px;
   margin: 10px 0 20px;
 }
 
+/* container normal */
 .blinkie {
-  position: relative;
   width: 100px;
   height: 100px;
   overflow: hidden;
-  background: #000;
+  position: relative;
 }
 
+/* container wide → ocupă tot rândul */
 .blinkie.wide {
   grid-column: span 3;
   width: 100%;
   height: 100px;
 }
 
+/* img */
 .blinkie img {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-/* Overlay text cu litere random */
+/* overlay text litere colorate random */
 .blinkie .overlay {
   position: absolute;
   top: 0;
@@ -58,23 +60,27 @@ style.textContent = `
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
   font-size: 14px;
   font-weight: bold;
-  mix-blend-mode: difference;
   text-align: center;
-  flex-wrap: wrap;
 }
 
+/* FĂRĂ SCROLL ORIZONTAL SAU VERTICAL */
 html, body {
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto; /* scroll vertical permis */
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
 }
 
+/* SCROLL SUPER LENT */
 body {
-  scroll-behavior: smooth;
+  scroll-behavior: smooth; /* scroll lin și lent */
+  overscroll-behavior: contain;
+  line-height: 1.6;
 }
 `;
 document.head.appendChild(style);
@@ -101,10 +107,17 @@ function createBlinkie(src) {
   const img = document.createElement("img");
   img.src = src;
 
-  // Overlay text cu litere random
+  img.onload = () => {
+    const aspect = img.naturalWidth / img.naturalHeight;
+    if (aspect > 1.4) el.classList.add("wide");
+  };
+
+  img.onerror = () => el.remove();
+  el.appendChild(img);
+
+  // overlay litere colorate random
   const overlay = document.createElement("div");
   overlay.className = "overlay";
-
   const letters = "EMOSCENE123!@#";
   for (let i = 0; i < 5; i++) {
     const span = document.createElement("span");
@@ -112,15 +125,8 @@ function createBlinkie(src) {
     span.style.color = randomColor();
     overlay.appendChild(span);
   }
-
-  img.onload = () => {
-    const aspect = img.naturalWidth / img.naturalHeight;
-    if (aspect > 1.4) el.classList.add("wide");
-  };
-  img.onerror = () => el.remove();
-
-  el.appendChild(img);
   el.appendChild(overlay);
+
   return el;
 }
 
@@ -140,7 +146,7 @@ for (let i = 1; i <= 250; i++) addBlinkieIfExists(`1 (${i}).gif`);
 for (let i = 1; i <= 200; i++) addBlinkieIfExists(`2 (${i}).gif`);
 
 // =======================
-// 🔥 FLASH TEXT (RANDOM COLORS)
+// 🔥 FLASH TEXT BLINKIES (LITERE COLORATE RANDOM)
 // =======================
 const title = section.querySelector("h2");
 const text = title.textContent;
@@ -152,15 +158,3 @@ for (let char of text) {
   span.style.color = randomColor();
   title.appendChild(span);
 }
-
-// =======================
-// 🔥 SCROLL LENT AUTOMAT
-// =======================
-let scrollPos = 0;
-function autoScroll() {
-  scrollPos += 0.2; // viteza scroll-ului, mai mic = mai lent
-  if (scrollPos > document.body.scrollHeight - window.innerHeight) scrollPos = 0;
-  window.scrollTo(0, scrollPos);
-  requestAnimationFrame(autoScroll);
-}
-autoScroll();
