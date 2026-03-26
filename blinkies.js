@@ -103,7 +103,7 @@ const observer = new IntersectionObserver((entries) => {
     }
   });
 }, {
-  rootMargin: "200px" // încărcăm puțin înainte să apară în viewport
+  rootMargin: "5px" // încărcăm puțin înainte să apară în viewport
 });
 
 blinkies.forEach(el => observer.observe(el.querySelector('img')));
