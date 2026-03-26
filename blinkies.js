@@ -4,23 +4,25 @@
 const section = document.createElement("section");
 
 section.innerHTML = `
-<h2 style="color:#ff00ff;text-align:center; margin-bottom:15px;">
+<h2 style="color:#ff00ff;text-align:center; margin-bottom:10px; font-family:inherit;">
   Blinkies
 </h2>
 
 <div id="blinkiesContainer" style="
   display:grid;
-  grid-template-columns: repeat(4, 1fr); /* maxim 4 pe rând */
-  gap:8px;
+  grid-template-columns: repeat(4, 1fr); /* desktop */
+  gap:2px; /* minim spațiu intre GIF-uri */
   justify-items:center;
   align-items:start;
-  margin-top:15px;
+  margin-top:10px;
   margin-bottom:20px;
   overflow-y:auto;
   max-height:80vh; /* scroll vertical */
+  grid-auto-rows: min-content; /* fiecare GIF isi ia inaltimea proprie */
 "></div>
 `;
 
+// Inseram sectiunea dupa socials
 const socials = document.getElementById("socialsSection");
 socials.insertAdjacentElement("afterend", section);
 
@@ -39,10 +41,10 @@ function createBlinkie(src) {
 
   const img = document.createElement("img");
   img.src = src;
-  img.style.width = "100%";
+  img.style.width = "100%"; 
   img.style.height = "auto";
   img.style.objectFit = "contain";
-  img.style.maxWidth = "180px"; // 1.5x față de 120px anterior
+  img.style.maxWidth = "180px"; 
   img.style.maxHeight = "180px"; 
   img.onerror = () => el.remove();
 
@@ -50,18 +52,10 @@ function createBlinkie(src) {
     const aspect = img.naturalWidth / img.naturalHeight;
     if (aspect > 1.5) { // foarte orizontal
       el.style.gridColumn = "span 4"; // ocupă tot rândul
-      img.style.width = "100%";
-      img.style.height = "auto";
     } else if (aspect > 1.2) { // orizontal
       el.style.gridColumn = "span 2"; // ocupă 2 coloane
-      img.style.width = "100%";
-      img.style.height = "auto";
-    } else if (aspect < 0.8) { // vertical
-      img.style.height = "180px";
-      img.style.width = "auto";
-    } else { // aproape pătrat
-      img.style.width = "180px";
-      img.style.height = "180px";
+    } else { // vertical sau pătrat
+      el.style.gridColumn = "span 1";
     }
   };
 
@@ -131,3 +125,17 @@ function flashText() {
 }
 
 flashText();
+
+// =======================
+// 🔥 MEDIA QUERY PENTRU TELEFON
+// =======================
+const style = document.createElement("style");
+style.textContent = `
+@media (max-width: 600px) {
+  #blinkiesContainer {
+    grid-template-columns: repeat(2, 1fr); /* 2 GIF-uri pe rând pe telefon */
+    gap: 1px; /* spatiu minim */
+  }
+}
+`;
+document.head.appendChild(style);
