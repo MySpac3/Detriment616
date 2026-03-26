@@ -4,16 +4,15 @@
 const section = document.createElement("section");
 
 section.innerHTML = `
-<h2 style="color:#ff00ff;text-align:center;">
+<h2 style="color:#ff00ff;text-align:center;position:relative;z-index:10;text-align:center;">
   Blinkies
 </h2>
 
 <div id="blinkiesContainer" style="
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  justify-content:center;
-  align-items:center;
+  position:relative;
+  width:100%;
+  height:100vh;
+  overflow:hidden;
   margin-top:15px;
   margin-bottom:20px;
 "></div>
@@ -25,35 +24,37 @@ socials.insertAdjacentElement("afterend", section);
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
-// 🔥 CREATE BLINKIE ELEMENT (DIMENSIUNE AUTOMATĂ)
+// 🔥 CREATE BLINKIE ELEMENT (DIMENSIUNE AUTOMATĂ, RANDOM)
 // =======================
 function createBlinkie(src) {
   const el = document.createElement("div");
-  el.style.margin = "2px";
-  el.style.display = "flex";
-  el.style.alignItems = "center";
-  el.style.justifyContent = "center";
-  el.style.borderRadius = "4px";
-  el.style.transition = "0.1s";
-  el.style.overflow = "hidden";
-
+  el.style.position = "absolute";
+  el.style.transition = "0.3s";
+  
   const img = document.createElement("img");
   img.src = src;
-  img.style.display = "block";      // elimină spațiile albe
-  img.style.height = "auto";        // păstrează proporțiile originale
-  img.style.width = "auto";         // păstrează proporțiile originale
-  img.style.maxWidth = "200px";     // opțional, să nu fie uriașe
-  img.style.maxHeight = "200px";    // opțional
-
+  img.style.display = "block";
+  img.style.width = "auto";
+  img.style.height = "auto";
+  img.style.maxWidth = "200px";  // optional
+  img.style.maxHeight = "200px"; // optional
   img.onerror = () => el.remove();
 
-  // Ajustăm containerul după dimensiunea reală a GIF-ului
   img.onload = () => {
-    el.style.width = img.naturalWidth + "px";
-    el.style.height = img.naturalHeight + "px";
+    // Poziție random în container
+    const maxX = container.clientWidth - img.naturalWidth;
+    const maxY = container.clientHeight - img.naturalHeight;
+    el.style.left = Math.random() * (maxX > 0 ? maxX : 0) + "px";
+    el.style.top = Math.random() * (maxY > 0 ? maxY : 0) + "px";
+
+    // Redimensionare aleator pentru efect mosaic
+    const scale = 0.3 + Math.random() * 0.7; // 30%-100%
+    img.style.width = img.naturalWidth * scale + "px";
+    img.style.height = img.naturalHeight * scale + "px";
   };
 
   el.appendChild(img);
+  container.appendChild(el);
   return el;
 }
 
@@ -66,7 +67,6 @@ for (let base = 1; base <= 6; base++) {
   for (let i = 1; i <= 1000; i++) {
     const name = `${base} (${i}).gif`;
     const el = createBlinkie(name);
-    container.appendChild(el);
     blinkies.push(el);
   }
 }
