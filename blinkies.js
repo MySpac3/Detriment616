@@ -10,13 +10,11 @@ section.innerHTML = `
 
 <div id="blinkiesContainer" style="
   display:grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(10, 100px); /* 10 coloane fixe */
   gap:2px;
-  justify-items:center;
-  align-items:start;
+  justify-content:center;
   margin-top:10px;
   margin-bottom:20px;
-  grid-auto-rows: min-content;
 "></div>
 `;
 
@@ -24,22 +22,19 @@ document.getElementById("socialsSection").insertAdjacentElement("afterend", sect
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
-// 🔥 CREATE BLINKIE ELEMENT (LAZY LOADING)
+// 🔥 CREATE BLINKIE ELEMENT
 // =======================
 function createBlinkie(src) {
   const el = document.createElement("div");
-  el.style.display = "flex";
-  el.style.alignItems = "center";
-  el.style.justifyContent = "center";
-  el.style.width = "100%";
+  el.style.width = "100px";
+  el.style.height = "100px";
+  el.style.overflow = "hidden";
 
   const img = document.createElement("img");
   img.dataset.src = src;
   img.style.width = "100%";
-  img.style.height = "auto";
+  img.style.height = "100%";
   img.style.objectFit = "contain";
-  img.style.maxWidth = "180px";
-  img.style.maxHeight = "180px";
   img.onerror = () => el.remove();
 
   el.appendChild(img);
@@ -47,7 +42,7 @@ function createBlinkie(src) {
 }
 
 // =======================
-// 🔥 GENERATE FILE NAMES + RANDOMIZE
+// 🔥 GENERATE FILE NAMES (FIX ORDER, FĂRĂ RANDOM)
 // =======================
 const blinkies = [];
 const fileNames = [];
@@ -58,13 +53,7 @@ for (let base = 1; base <= 6; base++) {
   }
 }
 
-// Shuffle
-for (let i = fileNames.length - 1; i > 0; i--) {
-  const j = Math.floor(Math.random() * (i + 1));
-  [fileNames[i], fileNames[j]] = [fileNames[j], fileNames[i]];
-}
-
-// Add blinkies
+// Add blinkies in order
 fileNames.forEach(name => {
   const el = createBlinkie(name);
   container.appendChild(el);
@@ -72,7 +61,7 @@ fileNames.forEach(name => {
 });
 
 // =======================
-// 🔥 LAZY LOADING OBSERVER (SCROLL MAI PUȚIN SENSIBIL)
+// 🔥 LAZY LOADING OBSERVER
 // =======================
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
@@ -80,31 +69,17 @@ const observer = new IntersectionObserver((entries) => {
       const img = entry.target;
       if (img.dataset.src) {
         img.src = img.dataset.src;
-        img.onload = () => {
-          const aspect = img.naturalWidth / img.naturalHeight;
-          const el = img.parentElement;
-
-          if (window.innerWidth > 600) {
-            if (aspect > 1.5) el.style.gridColumn = "span 4";
-            else if (aspect > 1.2) el.style.gridColumn = "span 2";
-            else el.style.gridColumn = "span 1";
-          } else {
-            if (window.innerWidth < 400) el.style.gridColumn = "span 2";
-            else if (window.innerWidth < 800) el.style.gridColumn = "span 3";
-            else el.style.gridColumn = "span 4";
-          }
-        };
         img.removeAttribute('data-src');
       }
       observer.unobserve(img);
     }
   });
-}, { rootMargin: "5px" }); // mai mic decât 200px => scroll mai puțin sensibil
+}, { rootMargin: "5px" });
 
 blinkies.forEach(el => observer.observe(el.querySelector('img')));
 
 // =======================
-// 🔥 FLASHING TEXT (MINIM)
+// 🔥 FLASHING TEXT
 // =======================
 const title = section.querySelector("h2");
 const text = title.textContent;
@@ -131,7 +106,7 @@ const style = document.createElement("style");
 style.textContent = `
 @media (max-width: 600px) {
   #blinkiesContainer {
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    grid-template-columns: repeat(5, 80px);
     gap: 1px;
   }
 }
