@@ -10,7 +10,7 @@ section.innerHTML = `
 
 <div id="blinkiesContainer" style="
   display:grid;
-  grid-template-columns: repeat(4, 1fr); /* desktop */
+  grid-template-columns: repeat(4, 1fr);
   gap:2px;
   justify-items:center;
   align-items:start;
@@ -42,6 +42,7 @@ function createBlinkie(src) {
   img.style.maxWidth = "180px";
   img.style.maxHeight = "180px";
 
+  // Skip dacă nu există
   img.onerror = () => el.remove();
 
   img.onload = () => {
@@ -69,18 +70,20 @@ function createBlinkie(src) {
 const blinkies = [];
 const fileNames = [];
 
+// Generăm toate numele posibile
 for (let base = 1; base <= 6; base++) {
   for (let i = 1; i <= 1000; i++) {
     fileNames.push(`${base} (${i}).gif`);
   }
 }
 
-// Shuffle aleator
+// Shuffle array aleator
 for (let i = fileNames.length - 1; i > 0; i--) {
   const j = Math.floor(Math.random() * (i + 1));
   [fileNames[i], fileNames[j]] = [fileNames[j], fileNames[i]];
 }
 
+// Creăm și adăugăm blinkies (skip automat la inexistente)
 fileNames.forEach(name => {
   const el = createBlinkie(name);
   container.appendChild(el);
