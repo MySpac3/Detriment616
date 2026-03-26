@@ -15,13 +15,13 @@ document.getElementById("socialsSection").insertAdjacentElement("afterend", sect
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
-// 🔥 GRID STYLE (CURAT)
+// 🔥 GRID STYLE (GLOBAL)
 // =======================
 const style = document.createElement("style");
 style.textContent = `
 #blinkiesContainer {
   display: grid;
-  grid-template-columns: repeat(3, 100px);
+  grid-template-columns: repeat(3, 100px); /* MAX 3 pe rând */
   justify-content: center;
   gap: 4px;
   margin: 10px 0 20px;
@@ -34,34 +34,40 @@ style.textContent = `
   overflow: hidden;
 }
 
-/* wide → 1 pe rând */
+/* container wide → ocupă tot rândul */
 .blinkie.wide {
   grid-column: span 3;
   width: 100%;
   height: 100px;
 }
 
-/* imagine */
+/* img */
 .blinkie img {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-/* ❗ IMPORTANT: fără scroll orizontal */
+/* FĂRĂ SCROLL ORIZONTAL */
 html, body {
   overflow-x: hidden;
 }
 
-/* scroll natural, fără modificări */
+/* SCROLL SUPER SMOOTH */
 body {
-  overscroll-behavior-y: auto;
+  scroll-behavior: smooth;
+  overscroll-behavior-y: contain;
+}
+
+/* încetinește feeling-ul de scroll */
+body {
+  line-height: 1.6;
 }
 `;
 document.head.appendChild(style);
 
 // =======================
-// 🔥 CREATE BLINKIE
+// 🔥 CREATE BLINKIE ELEMENT
 // =======================
 function createBlinkie(src) {
   const el = document.createElement("div");
@@ -70,11 +76,13 @@ function createBlinkie(src) {
   const img = document.createElement("img");
   img.src = src;
 
+  // detectăm dacă e wide DUPĂ ce se încarcă
   img.onload = () => {
     const aspect = img.naturalWidth / img.naturalHeight;
 
+    // dacă e wide → ocupă tot rândul
     if (aspect > 1.4) {
-      el.classList.add("wide"); // stacked dacă e wide
+      el.classList.add("wide");
     }
   };
 
@@ -85,14 +93,15 @@ function createBlinkie(src) {
 }
 
 // =======================
-// 🔥 ADD BLINKIES
+// 🔥 ADD BLINKIES (DOAR EXISTENTE)
 // =======================
 function addBlinkieIfExists(src) {
   const test = new Image();
   test.src = src;
 
   test.onload = () => {
-    container.appendChild(createBlinkie(src));
+    const el = createBlinkie(src);
+    container.appendChild(el);
   };
 }
 
@@ -111,7 +120,7 @@ for (let i = 1; i <= 200; i++) {
 }
 
 // =======================
-// 🔥 FLASH TEXT FIX
+// 🔥 FLASH TEXT (FIX)
 // =======================
 const title = section.querySelector("h2");
 const text = title.textContent;
