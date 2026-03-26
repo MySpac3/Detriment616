@@ -31,71 +31,34 @@ function createBlinkie(src) {
   el.style.overflow = "hidden";
 
   const img = document.createElement("img");
-  img.src = src; // direct load
+  img.src = src; // direct, fără lazy loading
   img.style.width = "100%";
   img.style.height = "100%";
   img.style.objectFit = "contain";
-  img.onerror = () => el.remove();
+  img.onerror = () => el.remove(); // dacă GIF-ul nu există
 
   el.appendChild(img);
   return el;
 }
 
 // =======================
-// 🔥 GENERATE FILE NAMES (FIX ORDER, FĂRĂ RANDOM)
+// 🔥 ADD BLINKIES TO DOM (FIX ORDER)
 // =======================
-const blinkies = [];
-const fileNames = [];
 
-for (let base = 1; base <= 6; base++) {
-  for (let i = 1; i <= 1000; i++) {
-    fileNames.push(`${base} (${i}).gif`);
-  }
+// Folder 1 → 1–250
+for (let i = 1; i <= 250; i++) {
+  const el = createBlinkie(`1 (${i}).gif`);
+  container.appendChild(el);
+}
+
+// Folder 2 → 1–200
+for (let i = 1; i <= 200; i++) {
+  const el = createBlinkie(`2 (${i}).gif`);
+  container.appendChild(el);
 }
 
 // =======================
-// 🔥 PRELOAD ALL GIFS
-// =======================
-let loadedCount = 0;
-
-function preloadGIFs(names) {
-  return new Promise((resolve) => {
-    names.forEach(name => {
-      const img = new Image();
-      img.src = name;
-      img.onload = () => {
-        loadedCount++;
-        if (loadedCount === names.length) {
-          resolve();
-        }
-      };
-      img.onerror = () => {
-        loadedCount++;
-        if (loadedCount === names.length) {
-          resolve();
-        }
-      };
-    });
-  });
-}
-
-// =======================
-// 🔥 START SITE AFTER PRELOAD
-// =======================
-preloadGIFs(fileNames).then(() => {
-  // După ce toate GIF-urile s-au preîncărcat, le adăugăm în container
-  fileNames.forEach(name => {
-    const el = createBlinkie(name);
-    container.appendChild(el);
-    blinkies.push(el);
-  });
-
-  // Start slow auto scroll
-  startSlowScroll();
-});
-
-// =======================
-// 🔥 FLASHING TEXT
+// 🔥 FLASHING TEXT FIX
 // =======================
 const title = section.querySelector("h2");
 const text = title.textContent;
@@ -104,16 +67,9 @@ title.textContent = "";
 for (let char of text) {
   const span = document.createElement("span");
   span.textContent = char;
+  span.style.color = "#ff00ff"; // fix, fără random
   title.appendChild(span);
 }
-
-function flashText() {
-  title.querySelectorAll('span').forEach(span => {
-    if (Math.random() < 0.3) span.style.color = `rgb(${Math.random()*255|0},${Math.random()*255|0},${Math.random()*255|0})`;
-  });
-  requestAnimationFrame(flashText);
-}
-flashText();
 
 // =======================
 // 🔥 SLOW AUTO SCROLL
@@ -130,6 +86,7 @@ function startSlowScroll() {
   }
   requestAnimationFrame(scrollStep);
 }
+startSlowScroll();
 
 // =======================
 // 🔥 MEDIA QUERY MOBILE
