@@ -10,12 +10,13 @@ section.innerHTML = `
 
 <div id="blinkiesContainer" style="
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
   gap:4px;
   justify-items:center;
   align-items:center;
   margin-top:15px;
   margin-bottom:20px;
+  max-width:100%;
 "></div>
 `;
 
@@ -33,15 +34,31 @@ function createBlinkie(src) {
   el.style.alignItems = "center";
   el.style.justifyContent = "center";
   el.style.transition = "0.1s";
+  el.style.width = "100%";
 
   const img = document.createElement("img");
   img.src = src;
-  img.style.height = "auto";
   img.style.width = "100%";
-  img.style.maxWidth = "60px"; // poate fi ajustat
-  img.style.maxHeight = "60px"; // poate fi ajustat
+  img.style.height = "auto";
   img.style.objectFit = "contain";
-  img.onerror = () => el.remove(); // elimină fișierele inexistente
+  img.style.maxWidth = "80px"; // maxim pe orizontal
+  img.style.maxHeight = "80px"; // maxim pe vertical
+  img.onerror = () => el.remove();
+
+  // Ajustăm dimensiunea după încărcare, în funcție de proporții
+  img.onload = () => {
+    const aspect = img.naturalWidth / img.naturalHeight;
+    if (aspect > 1.2) { // GIF orizontal
+      img.style.width = "100%";
+      img.style.height = "auto";
+    } else if (aspect < 0.8) { // GIF vertical
+      img.style.height = "80px";
+      img.style.width = "auto";
+    } else { // aproape pătrat
+      img.style.width = "80px";
+      img.style.height = "80px";
+    }
+  };
 
   el.appendChild(img);
   return el;
