@@ -16,7 +16,7 @@ section.innerHTML = `
   align-items:start;
   margin-top:10px;
   margin-bottom:20px;
-  grid-auto-rows: min-content;
+  grid-auto-rows: 180px; /* fixăm înălțimea celulelor */
 "></div>
 `;
 
@@ -24,7 +24,7 @@ document.getElementById("socialsSection").insertAdjacentElement("afterend", sect
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
-// 🔥 CREATE BLINKIE ELEMENT (LAZY LOADING)
+// 🔥 CREATE BLINKIE ELEMENT (FIXED POSITION, LAZY)
 // =======================
 function createBlinkie(src) {
   const el = document.createElement("div");
@@ -32,14 +32,13 @@ function createBlinkie(src) {
   el.style.alignItems = "center";
   el.style.justifyContent = "center";
   el.style.width = "100%";
+  el.style.height = "100%"; // forțăm să ocupe întreaga celulă
 
   const img = document.createElement("img");
   img.dataset.src = src;
-  img.style.width = "100%";
-  img.style.height = "auto";
+  img.style.maxWidth = "100%";
+  img.style.maxHeight = "100%";
   img.style.objectFit = "contain";
-  img.style.maxWidth = "180px";
-  img.style.maxHeight = "180px";
   img.onerror = () => el.remove();
 
   el.appendChild(img);
@@ -52,27 +51,30 @@ function createBlinkie(src) {
 const blinkies = [];
 const fileNames = [];
 
+// 6 seturi x 1000 GIF-uri
 for (let base = 1; base <= 6; base++) {
   for (let i = 1; i <= 1000; i++) {
     fileNames.push(`${base} (${i}).gif`);
   }
 }
 
-// Shuffle
+// Shuffle array-ul
 for (let i = fileNames.length - 1; i > 0; i--) {
   const j = Math.floor(Math.random() * (i + 1));
   [fileNames[i], fileNames[j]] = [fileNames[j], fileNames[i]];
 }
 
-// Add blinkies
-fileNames.forEach(name => {
-  const el = createBlinkie(name);
+// Creăm un număr fix de celule (ex: 24 pentru desktop)
+const totalCells = 24;
+for (let i = 0; i < totalCells; i++) {
+  const randomGif = fileNames[Math.floor(Math.random() * fileNames.length)];
+  const el = createBlinkie(randomGif);
   container.appendChild(el);
   blinkies.push(el);
-});
+}
 
 // =======================
-// 🔥 LAZY LOADING OBSERVER (SCROLL MAI PUȚIN SENSIBIL)
+// 🔥 LAZY LOADING OBSERVER
 // =======================
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
@@ -80,26 +82,12 @@ const observer = new IntersectionObserver((entries) => {
       const img = entry.target;
       if (img.dataset.src) {
         img.src = img.dataset.src;
-        img.onload = () => {
-          const aspect = img.naturalWidth / img.naturalHeight;
-          const el = img.parentElement;
-
-          if (window.innerWidth > 600) {
-            if (aspect > 1.5) el.style.gridColumn = "span 4";
-            else if (aspect > 1.2) el.style.gridColumn = "span 2";
-            else el.style.gridColumn = "span 1";
-          } else {
-            if (window.innerWidth < 400) el.style.gridColumn = "span 2";
-            else if (window.innerWidth < 800) el.style.gridColumn = "span 3";
-            else el.style.gridColumn = "span 4";
-          }
-        };
         img.removeAttribute('data-src');
       }
       observer.unobserve(img);
     }
   });
-}, { rootMargin: "50px" }); // mai mic decât 200px => scroll mai puțin sensibil
+}, { rootMargin: "20px" });
 
 blinkies.forEach(el => observer.observe(el.querySelector('img')));
 
