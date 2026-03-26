@@ -46,7 +46,7 @@ function createBlinkie(src) {
 }
 
 // =======================
-// 🔥 GENERATE FILE NAMES + RANDOMIZE
+// 🔥 GENERATE FILE NAMES + SHUFFLE
 // =======================
 const blinkies = [];
 const fileNames = [];
@@ -58,17 +58,18 @@ for (let base = 1; base <= 6; base++) {
   }
 }
 
-// Shuffle array-ul
+// Shuffle array-ul complet, astfel încât ordinea să nu fie de la 1 la 1000
 for (let i = fileNames.length - 1; i > 0; i--) {
   const j = Math.floor(Math.random() * (i + 1));
   [fileNames[i], fileNames[j]] = [fileNames[j], fileNames[i]];
 }
 
-// Creăm un număr fix de celule (ex: 24 pentru desktop)
-const totalCells = 24;
+// =======================
+// 🔥 FIXED CELLS (NUMĂR FIX DE CELULE)
+// =======================
+const totalCells = 24; // câte celule dorim să afișăm
 for (let i = 0; i < totalCells; i++) {
-  const randomGif = fileNames[Math.floor(Math.random() * fileNames.length)];
-  const el = createBlinkie(randomGif);
+  const el = createBlinkie(fileNames[i]); // folosim GIF-urile amestecate în ordine fixă
   container.appendChild(el);
   blinkies.push(el);
 }
@@ -87,7 +88,7 @@ const observer = new IntersectionObserver((entries) => {
       observer.unobserve(img);
     }
   });
-}, { rootMargin: "20px" });
+}, { rootMargin: "10px" }); // scroll mai puțin sensibil
 
 blinkies.forEach(el => observer.observe(el.querySelector('img')));
 
@@ -106,7 +107,8 @@ for (let char of text) {
 
 function flashText() {
   title.querySelectorAll('span').forEach(span => {
-    if (Math.random() < 0.3) span.style.color = `rgb(${Math.random()*255|0},${Math.random()*255|0},${Math.random()*255|0})`;
+    if (Math.random() < 0.3)
+      span.style.color = `rgb(${Math.random()*255|0},${Math.random()*255|0},${Math.random()*255|0})`;
   });
   requestAnimationFrame(flashText);
 }
