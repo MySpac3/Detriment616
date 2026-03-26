@@ -25,25 +25,28 @@ socials.insertAdjacentElement("afterend", section);
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
-// 🔥 CREATE BLINKIE ELEMENT
+// 🔥 CREATE BLINKIE ELEMENT (DIMENSIUNE AUTOMATĂ)
 // =======================
 function createBlinkie(src) {
   const el = document.createElement("div");
-  el.style.height = "93px"; // 31px * 3
-  el.style.width = "93px";
   el.style.margin = "2px";
   el.style.display = "flex";
   el.style.alignItems = "center";
   el.style.justifyContent = "center";
   el.style.borderRadius = "4px";
   el.style.transition = "0.1s";
+  el.style.overflow = "hidden";
 
   const img = document.createElement("img");
   img.src = src;
-  img.style.height = "93px";
-  img.style.width = "93px";
-  img.style.objectFit = "cover";
-  img.onerror = () => el.remove(); // elimină fișierele inexistente
+
+  // Când imaginea se încarcă, setăm containerul după dimensiunea ei reală
+  img.onload = () => {
+    el.style.width = img.naturalWidth + "px";
+    el.style.height = img.naturalHeight + "px";
+  };
+
+  img.onerror = () => el.remove();
 
   el.appendChild(img);
   return el;
