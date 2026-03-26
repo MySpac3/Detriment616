@@ -8,33 +8,84 @@ section.innerHTML = `
   Blinkies
 </h2>
 
-<div id="blinkiesContainer" style="
-  display:grid;
-  grid-template-columns: repeat(10, 100px); /* 10 coloane fixe */
-  gap:2px;
-  justify-content:center;
-  margin-top:10px;
-  margin-bottom:20px;
-"></div>
+<div id="blinkiesContainer"></div>
 `;
 
 document.getElementById("socialsSection").insertAdjacentElement("afterend", section);
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
+// 🔥 GRID STYLE (GLOBAL)
+// =======================
+const style = document.createElement("style");
+style.textContent = `
+#blinkiesContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 100px); /* MAX 3 pe rând */
+  justify-content: center;
+  gap: 4px;
+  margin: 10px 0 20px;
+}
+
+/* container normal */
+.blinkie {
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+}
+
+/* container wide → ocupă tot rândul */
+.blinkie.wide {
+  grid-column: span 3;
+  width: 100%;
+  height: 100px;
+}
+
+/* img */
+.blinkie img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* FĂRĂ SCROLL ORIZONTAL */
+html, body {
+  overflow-x: hidden;
+}
+
+/* SCROLL SUPER SMOOTH */
+body {
+  scroll-behavior: smooth;
+  overscroll-behavior-y: contain;
+}
+
+/* încetinește feeling-ul de scroll */
+body {
+  line-height: 1.6;
+}
+`;
+document.head.appendChild(style);
+
+// =======================
 // 🔥 CREATE BLINKIE ELEMENT
 // =======================
 function createBlinkie(src) {
   const el = document.createElement("div");
-  el.style.width = "100px";
-  el.style.height = "100px";
-  el.style.overflow = "hidden";
+  el.className = "blinkie";
 
   const img = document.createElement("img");
-  img.dataset.src = src;
-  img.style.width = "100%";
-  img.style.height = "100%";
-  img.style.objectFit = "contain";
+  img.src = src;
+
+  // detectăm dacă e wide DUPĂ ce se încarcă
+  img.onload = () => {
+    const aspect = img.naturalWidth / img.naturalHeight;
+
+    // dacă e wide → ocupă tot rândul
+    if (aspect > 1.4) {
+      el.classList.add("wide");
+    }
+  };
+
   img.onerror = () => el.remove();
 
   el.appendChild(img);
@@ -42,44 +93,34 @@ function createBlinkie(src) {
 }
 
 // =======================
-// 🔥 GENERATE FILE NAMES (FIX ORDER, FĂRĂ RANDOM)
+// 🔥 ADD BLINKIES (DOAR EXISTENTE)
 // =======================
-const blinkies = [];
-const fileNames = [];
+function addBlinkieIfExists(src) {
+  const test = new Image();
+  test.src = src;
 
-for (let base = 1; base <= 6; base++) {
-  for (let i = 1; i <= 1000; i++) {
-    fileNames.push(`${base} (${i}).gif`);
-  }
+  test.onload = () => {
+    const el = createBlinkie(src);
+    container.appendChild(el);
+  };
 }
 
-// Add blinkies in order
-fileNames.forEach(name => {
-  const el = createBlinkie(name);
-  container.appendChild(el);
-  blinkies.push(el);
-});
+// =======================
+// 🔥 POPULARE
+// =======================
+
+// Folder 1 → 1–250
+for (let i = 1; i <= 250; i++) {
+  addBlinkieIfExists(`1 (${i}).gif`);
+}
+
+// Folder 2 → 1–200
+for (let i = 1; i <= 200; i++) {
+  addBlinkieIfExists(`2 (${i}).gif`);
+}
 
 // =======================
-// 🔥 LAZY LOADING OBSERVER
-// =======================
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const img = entry.target;
-      if (img.dataset.src) {
-        img.src = img.dataset.src;
-        img.removeAttribute('data-src');
-      }
-      observer.unobserve(img);
-    }
-  });
-}, { rootMargin: "5px" });
-
-blinkies.forEach(el => observer.observe(el.querySelector('img')));
-
-// =======================
-// 🔥 FLASHING TEXT
+// 🔥 FLASH TEXT (FIX)
 // =======================
 const title = section.querySelector("h2");
 const text = title.textContent;
@@ -88,27 +129,6 @@ title.textContent = "";
 for (let char of text) {
   const span = document.createElement("span");
   span.textContent = char;
+  span.style.color = "#ff00ff";
   title.appendChild(span);
 }
-
-function flashText() {
-  title.querySelectorAll('span').forEach(span => {
-    if (Math.random() < 0.3) span.style.color = `rgb(${Math.random()*255|0},${Math.random()*255|0},${Math.random()*255|0})`;
-  });
-  requestAnimationFrame(flashText);
-}
-flashText();
-
-// =======================
-// 🔥 MEDIA QUERY MOBILE
-// =======================
-const style = document.createElement("style");
-style.textContent = `
-@media (max-width: 600px) {
-  #blinkiesContainer {
-    grid-template-columns: repeat(5, 80px);
-    gap: 1px;
-  }
-}
-`;
-document.head.appendChild(style);  
