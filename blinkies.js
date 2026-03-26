@@ -50,24 +50,21 @@ style.textContent = `
 
 /* FĂRĂ SCROLL ORIZONTAL SAU VERTICAL */
 html, body {
-  overflow: hidden; /* ascunde scroll bar */
+  overflow: hidden;
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
 }
 
-/* SCROLL SUPER LENT (LENOSENSIBILITATE MAXIMĂ) */
+/* SCROLL SUPER LENT */
 body {
-  scroll-behavior: smooth;
-  overscroll-behavior: contain;
-  scroll-snap-type: y mandatory;
   line-height: 1.6;
 }
 
 /* FLASH TEXT */
 h2 span {
-  color: #ff00ff;
+  transition: color 0.5s;
 }
 `;
 document.head.appendChild(style);
@@ -84,9 +81,7 @@ function createBlinkie(src) {
 
   img.onload = () => {
     const aspect = img.naturalWidth / img.naturalHeight;
-    if (aspect > 1.4) {
-      el.classList.add("wide");
-    }
+    if (aspect > 1.4) el.classList.add("wide");
   };
 
   img.onerror = () => el.remove();
@@ -113,25 +108,47 @@ function addBlinkieIfExists(src) {
 // =======================
 
 // Folder 1 → 1–250
-for (let i = 1; i <= 250; i++) {
-  addBlinkieIfExists(`1 (${i}).gif`);
-}
+for (let i = 1; i <= 250; i++) addBlinkieIfExists(`1 (${i}).gif`);
 
 // Folder 2 → 1–200
-for (let i = 1; i <= 200; i++) {
-  addBlinkieIfExists(`2 (${i}).gif`);
-}
+for (let i = 1; i <= 200; i++) addBlinkieIfExists(`2 (${i}).gif`);
 
 // =======================
-// 🔥 FLASH TEXT (FIX)
+// 🔥 FLASH TEXT RANDOM COLOR
 // =======================
 const title = section.querySelector("h2");
 const text = title.textContent;
 title.textContent = "";
 
+// transformăm textul în span-uri individuale
 for (let char of text) {
   const span = document.createElement("span");
   span.textContent = char;
-  span.style.color = "#ff00ff";
   title.appendChild(span);
 }
+
+// funcție pentru culoare aleatorie
+function randomColor() {
+  const colors = ["#ff00ff", "#00ffff", "#ffff00", "#ff6600", "#00ff00", "#ff0066"];
+  return colors[Math.floor(Math.random() * colors.length)];
+}
+
+// schimbăm culoarea aleator pentru fiecare literă la interval
+setInterval(() => {
+  const spans = title.querySelectorAll("span");
+  spans.forEach(span => {
+    span.style.color = randomColor();
+  });
+}, 500);
+
+// =======================
+// 🔥 SCROLL SLOW MOTION
+// =======================
+let scrollY = 0;
+function slowScroll() {
+  scrollY += 0.2; // viteza scroll-ului (mai mic = mai lent)
+  if (scrollY > document.body.scrollHeight - window.innerHeight) scrollY = 0;
+  window.scrollTo(0, scrollY);
+  requestAnimationFrame(slowScroll);
+}
+requestAnimationFrame(slowScroll);
