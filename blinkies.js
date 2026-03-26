@@ -63,12 +63,21 @@ fileNames.forEach(name => {
 // =======================
 // 🔥 LAZY LOADING OBSERVER
 // =======================
-const observer = new IntersectionObserver((entries) => {
+let loadedCount = 0;
+const observer = new IntersectionObserver((entries, obs) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       const img = entry.target;
       if (img.dataset.src) {
         img.src = img.dataset.src;
+        img.onload = () => {
+          loadedCount++;
+          // Dacă s-au încărcat toate, oprim observer-ul
+          if (loadedCount === blinkies.length) {
+            obs.disconnect(); // oprește căutarea altor gifuri
+            startSlowScroll();
+          }
+        };
         img.removeAttribute('data-src');
       }
       observer.unobserve(img);
@@ -98,6 +107,22 @@ function flashText() {
   requestAnimationFrame(flashText);
 }
 flashText();
+
+// =======================
+// 🔥 SLOW AUTO SCROLL
+// =======================
+function startSlowScroll() {
+  let scrollY = 0;
+  const speed = 0.2; // px per frame, ajustează cât de lent vrei
+  function scrollStep() {
+    scrollY += speed;
+    window.scrollTo(0, scrollY);
+    if (scrollY < document.body.scrollHeight - window.innerHeight) {
+      requestAnimationFrame(scrollStep);
+    }
+  }
+  requestAnimationFrame(scrollStep);
+}
 
 // =======================
 // 🔥 MEDIA QUERY MOBILE
