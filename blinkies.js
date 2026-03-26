@@ -39,14 +39,19 @@ function createBlinkie(src) {
 
   const img = document.createElement("img");
   img.src = src;
+  img.style.display = "block";      // elimină spațiile albe
+  img.style.height = "auto";        // păstrează proporțiile originale
+  img.style.width = "auto";         // păstrează proporțiile originale
+  img.style.maxWidth = "200px";     // opțional, să nu fie uriașe
+  img.style.maxHeight = "200px";    // opțional
 
-  // Când imaginea se încarcă, setăm containerul după dimensiunea ei reală
+  img.onerror = () => el.remove();
+
+  // Ajustăm containerul după dimensiunea reală a GIF-ului
   img.onload = () => {
     el.style.width = img.naturalWidth + "px";
     el.style.height = img.naturalHeight + "px";
   };
-
-  img.onerror = () => el.remove();
 
   el.appendChild(img);
   return el;
@@ -57,7 +62,6 @@ function createBlinkie(src) {
 // =======================
 const blinkies = [];
 
-// Pentru fiecare nume de bază 1,2,3,4,5,6
 for (let base = 1; base <= 6; base++) {
   for (let i = 1; i <= 1000; i++) {
     const name = `${base} (${i}).gif`;
