@@ -48,20 +48,26 @@ style.textContent = `
   object-fit: contain;
 }
 
-/* FĂRĂ SCROLL ORIZONTAL */
+/* FĂRĂ SCROLL ORIZONTAL SAU VERTICAL */
 html, body {
-  overflow-x: hidden;
+  overflow: hidden; /* ascunde scroll bar */
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-/* SCROLL SUPER SMOOTH */
+/* SCROLL SUPER LENT (LENOSENSIBILITATE MAXIMĂ) */
 body {
   scroll-behavior: smooth;
-  overscroll-behavior-y: contain;
+  overscroll-behavior: contain;
+  scroll-snap-type: y mandatory;
+  line-height: 1.6;
 }
 
-/* încetinește feeling-ul de scroll */
-body {
-  line-height: 1.6;
+/* FLASH TEXT */
+h2 span {
+  color: #ff00ff;
 }
 `;
 document.head.appendChild(style);
@@ -76,11 +82,8 @@ function createBlinkie(src) {
   const img = document.createElement("img");
   img.src = src;
 
-  // detectăm dacă e wide DUPĂ ce se încarcă
   img.onload = () => {
     const aspect = img.naturalWidth / img.naturalHeight;
-
-    // dacă e wide → ocupă tot rândul
     if (aspect > 1.4) {
       el.classList.add("wide");
     }
