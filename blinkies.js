@@ -1,189 +1,153 @@
-<!DOCTYPE html>
-<html lang="ro">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blinkies cu Efecte</title>
-<style>
-  /* ======================= */
-  /* 🌹 SCROLL PRINCIPAL & BODY */
-  /* ======================= */
-  body {
-    margin: 0;
-    padding: 0;
-    background: #000;
-    color: #fff;
-    font-family: Arial, sans-serif;
-    overflow-x: hidden;
-    position: relative;
-  }
+// =======================
+// 🔥 CREATE SECTION
+// =======================
+const section = document.createElement("section");
 
-  /* ======================= */
-  /* 🔴 DUNGI ROSII MARGINI */
-  /* ======================= */
-  .red-stripe {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    width: 10px;
-    background: red;
-    z-index: 1000;
-  }
-  .red-stripe.left { left: 0; }
-  .red-stripe.right { right: 0; }
+section.innerHTML = `
+<h2 style="color:#ff00ff;text-align:center; margin-bottom:10px; font-family:inherit;">
+  Blinkies
+</h2>
 
-  /* ======================= */
-  /* 💉 PICURARE SANGE */
-  /* ======================= */
-  .blood-drop {
-    position: fixed;
-    top: -10px;
-    width: 6px;
-    height: 20px;
-    background: darkred;
-    border-radius: 50%;
-    z-index: 999;
-    animation: drop 2s linear infinite;
-  }
-  @keyframes drop {
-    0% { top: -20px; opacity: 1; transform: translateX(0) scaleY(1); }
-    80% { opacity: 1; }
-    100% { top: 100vh; opacity: 0; transform: translateX(0) scaleY(2); }
-  }
+<div id="blinkiesContainer"></div>
+`;
 
-  /* ======================= */
-  /* 🔥 GRID BLINKIES */
-  /* ======================= */
-  #blinkiesContainer {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 100px);
-    justify-content: center;
-    gap: 4px;
-    margin: 20px auto;
-  }
+document.getElementById("socialsSection").insertAdjacentElement("afterend", section);
+const container = document.getElementById("blinkiesContainer");
 
-  .blinkie {
-    width: 100px;
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 20px;
-    overflow: hidden;
-  }
+// =======================
+// 🔥 GRID STYLE (GLOBAL)
+// =======================
+const style = document.createElement("style");
+style.textContent = `
+#blinkiesContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 100px); /* MAX 3 pe rând */
+  justify-content: center;
+  gap: 4px;
+  margin: 10px 0 20px;
+}
 
-  .blinkie.wide {
-    grid-column: span 3;
-    width: 100%;
-    height: 100px;
-  }
+.blinkie {
+  position: relative; /* pentru litere random */
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+}
 
-  /* ======================= */
-  /* 🔥 TITLU CU LITERE COLORATE */
-  /* ======================= */
-  h2 {
-    text-align: center;
-    margin-bottom: 10px;
-  }
-  h2 span {
-    font-weight: bold;
-    transition: color 0.5s;
-  }
-</style>
-</head>
-<body>
+.blinkie.wide {
+  grid-column: span 3;
+  width: 100%;
+  height: 100px;
+}
 
-<!-- Dungi Rosii -->
-<div class="red-stripe left"></div>
-<div class="red-stripe right"></div>
+.blinkie img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 
-<!-- Sectiune Blinkies -->
-<section id="blinkiesSection">
-  <h2 id="blinkiesTitle">Blinkies</h2>
-  <div id="blinkiesContainer"></div>
-</section>
+/* litere random */
+.blinkie span {
+  position: absolute;
+  font-size: 14px;
+  font-weight: bold;
+  pointer-events: none;
+  user-select: none;
+}
 
-<script>
-  const container = document.getElementById("blinkiesContainer");
+/* FĂRĂ SCROLL ORIZONTAL SAU VERTICAL */
+html, body {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
 
-  // =======================
-  // 🌈 FUNCTII CULORI RANDOM
-  // =======================
-  function getRandomColor() {
-    const letters = "0123456789ABCDEF";
-    let color = "#";
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  }
+/* SCROLL SUPER LENT – 3X mai lent pe mobil */
+body {
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  scroll-snap-type: y mandatory;
+  line-height: 1.6;
+}
+`;
+document.head.appendChild(style);
 
-  function randomLetterColorEffect(element) {
-    const chars = element.textContent.split("");
-    element.innerHTML = "";
-    chars.forEach(char => {
+// =======================
+// 🔥 CREATE BLINKIE ELEMENT
+// =======================
+function createBlinkie(src) {
+  const el = document.createElement("div");
+  el.className = "blinkie";
+
+  const img = document.createElement("img");
+  img.src = src;
+
+  img.onload = () => {
+    const aspect = img.naturalWidth / img.naturalHeight;
+    if (aspect > 1.4) el.classList.add("wide");
+
+    // ADĂUGARE LITERE RANDOM COLORATE
+    for (let i = 0; i < 5; i++) { // 5 litere per blinkie
       const span = document.createElement("span");
-      span.textContent = char;
-      span.style.color = getRandomColor();
-      element.appendChild(span);
-    });
+      span.textContent = String.fromCharCode(65 + Math.floor(Math.random() * 26)); // A-Z
+      span.style.color = `hsl(${Math.random() * 360}, 80%, 60%)`;
+      span.style.top = `${Math.random() * 80}%`;
+      span.style.left = `${Math.random() * 80}%`;
+      el.appendChild(span);
+    }
+  };
 
-    // Schimbare continua
-    setInterval(() => {
-      const spans = element.querySelectorAll("span");
-      spans.forEach(span => {
-        span.style.color = getRandomColor();
-      });
-    }, 500);
-  }
+  img.onerror = () => el.remove();
+  el.appendChild(img);
+  return el;
+}
 
-  const title = document.getElementById("blinkiesTitle");
-  randomLetterColorEffect(title);
+// =======================
+// 🔥 ADD BLINKIES (DOAR EXISTENTE)
+// =======================
+function addBlinkieIfExists(src) {
+  const test = new Image();
+  test.src = src;
+  test.onload = () => {
+    const el = createBlinkie(src);
+    container.appendChild(el);
+  };
+}
 
-  // =======================
-  // 🌟 CREATE BLINKIE
-  // =======================
-  function createBlinkie(letter) {
-    const el = document.createElement("div");
-    el.className = "blinkie";
-    el.textContent = letter;
-    el.style.color = getRandomColor();
-    el.style.fontSize = "24px";
+// =======================
+// 🔥 POPULARE
+// =======================
 
-    // Schimbare continua culoare
-    setInterval(() => {
-      el.style.color = getRandomColor();
-    }, 500);
+// Folder 1 → 1–250
+for (let i = 1; i <= 250; i++) addBlinkieIfExists(`1 (${i}).gif`);
 
-    return el;
-  }
+// Folder 2 → 1–200
+for (let i = 1; i <= 200; i++) addBlinkieIfExists(`2 (${i}).gif`);
 
-  // =======================
-  // 🔥 POPULARE BLINKIES
-  // =======================
-  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
-  for (let i = 0; i < 50; i++) {
-    const randomChar = letters[Math.floor(Math.random() * letters.length)];
-    container.appendChild(createBlinkie(randomChar));
-  }
+// =======================
+// 🔥 FLASH TEXT (FIX)
+// =======================
+const title = section.querySelector("h2");
+const text = title.textContent;
+title.textContent = "";
+for (let char of text) {
+  const span = document.createElement("span");
+  span.textContent = char;
+  span.style.color = "#ff00ff";
+  title.appendChild(span);
+}
 
-  // =======================
-  // 💧 PICURARE SANGE
-  // =======================
-  function createBloodDrop() {
-    const drop = document.createElement("div");
-    drop.className = "blood-drop";
-    drop.style.left = Math.random() * window.innerWidth + "px";
-    drop.style.animationDuration = 1 + Math.random() * 2 + "s";
-    document.body.appendChild(drop);
+// =======================
+// 🔥 SCROLL AJUSTAT PE MOBIL
+// =======================
+let isScrolling;
+window.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  window.scrollBy(0, e.deltaY / 3); // 3x mai lent
+}, { passive: false });
 
-    setTimeout(() => drop.remove(), 3000);
-  }
-
-  // Creeaza picaturi la interval random
-  setInterval(createBloodDrop, 200);
-</script>
-
-</body>
-</html>
+window.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+}, { passive: false });
