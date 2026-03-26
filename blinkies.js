@@ -25,7 +25,7 @@ socials.insertAdjacentElement("afterend", section);
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
-// 🔥 CREATE BLINKIE ELEMENT
+// 🔥 CREATE BLINKIE ELEMENT WITH LOADING ANIMATION
 // =======================
 function createBlinkie(src) {
   const el = document.createElement("div");
@@ -33,7 +33,19 @@ function createBlinkie(src) {
   el.style.alignItems = "center";
   el.style.justifyContent = "center";
   el.style.width = "100%";
+  el.style.position = "relative";
 
+  // Placeholder loading
+  const loader = document.createElement("div");
+  loader.style.width = "100%";
+  loader.style.height = "180px";
+  loader.style.maxWidth = "180px";
+  loader.style.background = "linear-gradient(90deg, #ff00ff 25%, #ffffff 50%, #ff00ff 75%)";
+  loader.style.backgroundSize = "200% 100%";
+  loader.style.animation = "loadingAnimation 1s linear infinite";
+  loader.style.borderRadius = "4px";
+
+  // GIF element
   const img = document.createElement("img");
   img.src = src;
   img.style.width = "100%";
@@ -41,6 +53,12 @@ function createBlinkie(src) {
   img.style.objectFit = "contain";
   img.style.maxWidth = "180px";
   img.style.maxHeight = "180px";
+  img.style.position = "absolute";
+  img.style.top = "0";
+  img.style.left = "0";
+  img.style.opacity = "0";
+  img.style.transition = "opacity 0.5s ease";
+
   img.onerror = () => el.remove();
 
   img.onload = () => {
@@ -48,23 +66,20 @@ function createBlinkie(src) {
 
     if (window.innerWidth > 600) { 
       // Desktop
-      if (aspect > 1.5) { 
-        el.style.gridColumn = "span 4";
-      } else if (aspect > 1.2) {
-        el.style.gridColumn = "span 2";
-      } else {
-        el.style.gridColumn = "span 1";
-      }
+      if (aspect > 1.5) el.style.gridColumn = "span 4";
+      else if (aspect > 1.2) el.style.gridColumn = "span 2";
+      else el.style.gridColumn = "span 1";
     } else {
       // Mobil
-      if (aspect > 1.2) {
-        el.style.gridColumn = "span 2"; // ocupa două coloane pe mobil
-      } else {
-        el.style.gridColumn = "span 1"; // vertical / pătrat
-      }
+      if (aspect > 1.2) el.style.gridColumn = "span 2";
+      else el.style.gridColumn = "span 1";
     }
+
+    img.style.opacity = "1"; // fade in GIF
+    loader.remove(); // eliminăm loader
   };
 
+  el.appendChild(loader);
   el.appendChild(img);
   return el;
 }
@@ -75,20 +90,18 @@ function createBlinkie(src) {
 const blinkies = [];
 const fileNames = [];
 
-// Generăm toate numele
 for (let base = 1; base <= 6; base++) {
   for (let i = 1; i <= 1000; i++) {
     fileNames.push(`${base} (${i}).gif`);
   }
 }
 
-// Shuffle array aleator
+// Shuffle aleator
 for (let i = fileNames.length - 1; i > 0; i--) {
   const j = Math.floor(Math.random() * (i + 1));
   [fileNames[i], fileNames[j]] = [fileNames[j], fileNames[i]];
 }
 
-// Creăm și adăugăm blinkies
 fileNames.forEach(name => {
   const el = createBlinkie(name);
   container.appendChild(el);
@@ -139,6 +152,12 @@ style.textContent = `
     grid-template-columns: repeat(2, 1fr);
     gap: 1px;
   }
+}
+
+/* Loading animation */
+@keyframes loadingAnimation {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 `;
 document.head.appendChild(style);
