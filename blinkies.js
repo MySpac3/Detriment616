@@ -15,59 +15,45 @@ document.getElementById("socialsSection").insertAdjacentElement("afterend", sect
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
-// 🔥 GRID STYLE (GLOBAL)
+// 🔥 GRID STYLE
 // =======================
 const style = document.createElement("style");
 style.textContent = `
 #blinkiesContainer {
   display: grid;
-  grid-template-columns: repeat(3, 100px); /* MAX 3 pe rând */
+  grid-template-columns: repeat(3, 100px);
   justify-content: center;
   gap: 4px;
   margin: 10px 0 20px;
 }
 
-/* container normal */
 .blinkie {
   width: 100px;
   height: 100px;
   overflow: hidden;
 }
 
-/* container wide → ocupă tot rândul */
 .blinkie.wide {
   grid-column: span 3;
   width: 100%;
   height: 100px;
 }
 
-/* img */
 .blinkie img {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-/* FĂRĂ SCROLL ORIZONTAL */
 html, body {
   overflow-x: hidden;
-}
-
-/* SCROLL SUPER SMOOTH */
-body {
-  scroll-behavior: smooth;
-  overscroll-behavior-y: contain;
-}
-
-/* încetinește feeling-ul de scroll */
-body {
-  line-height: 1.6;
+  touch-action: none; /* IMPORTANT pentru control total touch */
 }
 `;
 document.head.appendChild(style);
 
 // =======================
-// 🔥 CREATE BLINKIE ELEMENT
+// 🔥 CREATE BLINKIE
 // =======================
 function createBlinkie(src) {
   const el = document.createElement("div");
@@ -76,14 +62,9 @@ function createBlinkie(src) {
   const img = document.createElement("img");
   img.src = src;
 
-  // detectăm dacă e wide DUPĂ ce se încarcă
   img.onload = () => {
     const aspect = img.naturalWidth / img.naturalHeight;
-
-    // dacă e wide → ocupă tot rândul
-    if (aspect > 1.4) {
-      el.classList.add("wide");
-    }
+    if (aspect > 1.4) el.classList.add("wide");
   };
 
   img.onerror = () => el.remove();
@@ -93,34 +74,29 @@ function createBlinkie(src) {
 }
 
 // =======================
-// 🔥 ADD BLINKIES (DOAR EXISTENTE)
+// 🔥 ADD BLINKIES
 // =======================
 function addBlinkieIfExists(src) {
   const test = new Image();
   test.src = src;
 
   test.onload = () => {
-    const el = createBlinkie(src);
-    container.appendChild(el);
+    container.appendChild(createBlinkie(src));
   };
 }
 
-// =======================
-// 🔥 POPULARE
-// =======================
-
-// Folder 1 → 1–250
+// Folder 1
 for (let i = 1; i <= 250; i++) {
   addBlinkieIfExists(`1 (${i}).gif`);
 }
 
-// Folder 2 → 1–200
+// Folder 2
 for (let i = 1; i <= 200; i++) {
   addBlinkieIfExists(`2 (${i}).gif`);
 }
 
 // =======================
-// 🔥 FLASH TEXT (FIX)
+// 🔥 FLASH TEXT
 // =======================
 const title = section.querySelector("h2");
 const text = title.textContent;
@@ -132,3 +108,32 @@ for (let char of text) {
   span.style.color = "#ff00ff";
   title.appendChild(span);
 }
+
+// =======================
+// 🔥 TOUCH SCROLL CONTROL (ULTRA SLOW)
+// =======================
+let lastY = 0;
+let currentY = window.scrollY;
+
+const SCROLL_FACTOR = 0.2; // 🔥 mai mic = mai lent (poți pune 0.1 pentru EXTREM lent)
+
+window.addEventListener("touchstart", (e) => {
+  lastY = e.touches[0].clientY;
+});
+
+window.addEventListener("touchmove", (e) => {
+  e.preventDefault(); // oprim scroll-ul default
+
+  const currentTouchY = e.touches[0].clientY;
+  const delta = lastY - currentTouchY;
+
+  // aplicăm damping (încetinire)
+  currentY += delta * SCROLL_FACTOR;
+
+  // limitări (nu ieșim din pagină)
+  currentY = Math.max(0, Math.min(currentY, document.body.scrollHeight - window.innerHeight));
+
+  window.scrollTo(0, currentY);
+
+  lastY = currentTouchY;
+}, { passive: false });
