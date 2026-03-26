@@ -8,87 +8,39 @@ section.innerHTML = `
   Blinkies
 </h2>
 
-<div id="blinkiesContainer"></div>
+<div id="blinkiesContainer" style="
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap:2px;
+  justify-items:center;
+  align-items:start;
+  margin-top:10px;
+  margin-bottom:20px;
+  grid-auto-rows: 180px;
+"></div>
 `;
 
 document.getElementById("socialsSection").insertAdjacentElement("afterend", section);
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
-// 🔥 GRID STYLE (GLOBAL)
-// =======================
-const style = document.createElement("style");
-style.textContent = `
-#blinkiesContainer {
-  display: grid;
-  grid-template-columns: repeat(3, 100px); /* MAX 3 pe rând */
-  justify-content: center;
-  gap: 4px;
-  margin: 10px 0 20px;
-}
-
-/* container normal */
-.blinkie {
-  width: 100px;
-  height: 100px;
-  overflow: hidden;
-}
-
-/* container wide → ocupă tot rândul */
-.blinkie.wide {
-  grid-column: span 3;
-  width: 100%;
-  height: 100px;
-}
-
-/* img */
-.blinkie img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-/* FĂRĂ SCROLL ORIZONTAL SAU VERTICAL */
-html, body {
-  overflow: hidden; /* ascunde scroll bar */
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-/* SCROLL SUPER LENT (LENOSENSIBILITATE MAXIMĂ) */
-body {
-  scroll-behavior: smooth;
-  overscroll-behavior: contain;
-  scroll-snap-type: y mandatory;
-  line-height: 1.6;
-}
-
-/* FLASH TEXT */
-h2 span {
-  color: #ff00ff;
-}
-`;
-document.head.appendChild(style);
-
-// =======================
-// 🔥 CREATE BLINKIE ELEMENT
+// 🔥 CREATE BLINKIE ELEMENT (FIXED, LAZY)
 // =======================
 function createBlinkie(src) {
   const el = document.createElement("div");
-  el.className = "blinkie";
+  el.style.display = "flex";
+  el.style.alignItems = "center";
+  el.style.justifyContent = "center";
+  el.style.width = "100%";
+  el.style.height = "100%";
 
   const img = document.createElement("img");
-  img.src = src;
+  img.dataset.src = src;
+  img.style.maxWidth = "100%";
+  img.style.maxHeight = "100%";
+  img.style.objectFit = "contain";
 
-  img.onload = () => {
-    const aspect = img.naturalWidth / img.naturalHeight;
-    if (aspect > 1.4) {
-      el.classList.add("wide");
-    }
-  };
-
+  // Dacă GIF-ul nu există, eliminăm containerul
   img.onerror = () => el.remove();
 
   el.appendChild(img);
@@ -96,34 +48,53 @@ function createBlinkie(src) {
 }
 
 // =======================
-// 🔥 ADD BLINKIES (DOAR EXISTENTE)
+// 🔥 FIXED LIST OF GIFS
 // =======================
-function addBlinkieIfExists(src) {
-  const test = new Image();
-  test.src = src;
+const blinkies = [];
+const fileNames = [];
 
-  test.onload = () => {
-    const el = createBlinkie(src);
-    container.appendChild(el);
-  };
-}
-
-// =======================
-// 🔥 POPULARE
-// =======================
-
-// Folder 1 → 1–250
+// 1 (1-250).gif
 for (let i = 1; i <= 250; i++) {
-  addBlinkieIfExists(`1 (${i}).gif`);
+  fileNames.push(`1 (${i}).gif`);
 }
 
-// Folder 2 → 1–200
+// 2 (1-200).gif
 for (let i = 1; i <= 200; i++) {
-  addBlinkieIfExists(`2 (${i}).gif`);
+  fileNames.push(`2 (${i}).gif`);
 }
+
+// Poți adăuga alte seturi dacă vrei:
+// for (let i = 1; i <= 150; i++) fileNames.push(`3 (${i}).gif`);
 
 // =======================
-// 🔥 FLASH TEXT (FIX)
+// 🔥 CREATE CELLS FIXED ORDER
+// =======================
+fileNames.forEach(name => {
+  const el = createBlinkie(name);
+  container.appendChild(el);
+  blinkies.push(el);
+});
+
+// =======================
+// 🔥 LAZY LOADING OBSERVER
+// =======================
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const img = entry.target;
+      if (img.dataset.src) {
+        img.src = img.dataset.src;
+        img.removeAttribute('data-src');
+      }
+      observer.unobserve(img);
+    }
+  });
+}, { rootMargin: "5px" }); // încărcare rapidă
+
+blinkies.forEach(el => observer.observe(el.querySelector('img')));
+
+// =======================
+// 🔥 FLASHING TEXT MINIM
 // =======================
 const title = section.querySelector("h2");
 const text = title.textContent;
@@ -132,6 +103,28 @@ title.textContent = "";
 for (let char of text) {
   const span = document.createElement("span");
   span.textContent = char;
-  span.style.color = "#ff00ff";
   title.appendChild(span);
 }
+
+function flashText() {
+  title.querySelectorAll('span').forEach(span => {
+    if (Math.random() < 0.3)
+      span.style.color = `rgb(${Math.random()*255|0},${Math.random()*255|0},${Math.random()*255|0})`;
+  });
+  requestAnimationFrame(flashText);
+}
+flashText();
+
+// =======================
+// 🔥 MEDIA QUERY MOBILE
+// =======================
+const style = document.createElement("style");
+style.textContent = `
+@media (max-width: 600px) {
+  #blinkiesContainer {
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 1px;
+  }
+}
+`;
+document.head.appendChild(style);
