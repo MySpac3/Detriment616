@@ -16,8 +16,6 @@ section.innerHTML = `
   align-items:start;
   margin-top:10px;
   margin-bottom:20px;
-  overflow-y:auto;
-  max-height:80vh;
   grid-auto-rows: min-content;
 "></div>
 `;
