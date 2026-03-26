@@ -51,11 +51,12 @@ style.textContent = `
 /* ❗ IMPORTANT: fără scroll orizontal */
 html, body {
   overflow-x: hidden;
+  overscroll-behavior: none; /* oprește accelerarea */
+  touch-action: none;        /* dezactivează scroll-ul cu degetul */
 }
 
-/* scroll natural, fără modificări */
-body {
-  overscroll-behavior-y: auto;
+#mainContent {
+  overflow: hidden; /* blocare scroll conținut */
 }
 `;
 document.head.appendChild(style);
