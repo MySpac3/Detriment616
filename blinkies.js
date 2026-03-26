@@ -31,7 +31,7 @@ function createBlinkie(src) {
   el.style.overflow = "hidden";
 
   const img = document.createElement("img");
-  img.dataset.src = src;
+  img.src = src; // direct load
   img.style.width = "100%";
   img.style.height = "100%";
   img.style.objectFit = "contain";
@@ -53,39 +53,46 @@ for (let base = 1; base <= 6; base++) {
   }
 }
 
-// Add blinkies in order
-fileNames.forEach(name => {
-  const el = createBlinkie(name);
-  container.appendChild(el);
-  blinkies.push(el);
-});
-
 // =======================
-// 🔥 LAZY LOADING OBSERVER
+// 🔥 PRELOAD ALL GIFS
 // =======================
 let loadedCount = 0;
-const observer = new IntersectionObserver((entries, obs) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const img = entry.target;
-      if (img.dataset.src) {
-        img.src = img.dataset.src;
-        img.onload = () => {
-          loadedCount++;
-          // Dacă s-au încărcat toate, oprim observer-ul
-          if (loadedCount === blinkies.length) {
-            obs.disconnect(); // oprește căutarea altor gifuri
-            startSlowScroll();
-          }
-        };
-        img.removeAttribute('data-src');
-      }
-      observer.unobserve(img);
-    }
-  });
-}, { rootMargin: "5px" });
 
-blinkies.forEach(el => observer.observe(el.querySelector('img')));
+function preloadGIFs(names) {
+  return new Promise((resolve) => {
+    names.forEach(name => {
+      const img = new Image();
+      img.src = name;
+      img.onload = () => {
+        loadedCount++;
+        if (loadedCount === names.length) {
+          resolve();
+        }
+      };
+      img.onerror = () => {
+        loadedCount++;
+        if (loadedCount === names.length) {
+          resolve();
+        }
+      };
+    });
+  });
+}
+
+// =======================
+// 🔥 START SITE AFTER PRELOAD
+// =======================
+preloadGIFs(fileNames).then(() => {
+  // După ce toate GIF-urile s-au preîncărcat, le adăugăm în container
+  fileNames.forEach(name => {
+    const el = createBlinkie(name);
+    container.appendChild(el);
+    blinkies.push(el);
+  });
+
+  // Start slow auto scroll
+  startSlowScroll();
+});
 
 // =======================
 // 🔥 FLASHING TEXT
@@ -113,7 +120,7 @@ flashText();
 // =======================
 function startSlowScroll() {
   let scrollY = 0;
-  const speed = 0.2; // px per frame, ajustează cât de lent vrei
+  const speed = 0.2; // px per frame
   function scrollStep() {
     scrollY += speed;
     window.scrollTo(0, scrollY);
