@@ -40,7 +40,6 @@ function createBlinkie(src) {
   const img = document.createElement("img");
   img.src = src;
 
-  // Așteptăm ca imaginea să se încarce pentru a seta dimensiunea containerului
   img.onload = () => {
     el.style.width = img.naturalWidth + "px";
     el.style.height = img.naturalHeight + "px";
@@ -53,20 +52,24 @@ function createBlinkie(src) {
 }
 
 // =======================
-// 🔥 GENERATE GIFS FROM 1 TO 1000
+// 🔥 GENERATE GIFS 1-300 FOR BOTH TYPES
 // =======================
 const blinkies = [];
-let i = 1;
+let current = 1;
+const total = 300;
 
 function addNextBlinkie() {
-  if (i > 1000) return;
+  if (current > total) return;
 
-  const name = `1 (${i}).gif`;
-  const el = createBlinkie(name);
-  container.appendChild(el);
-  blinkies.push(el);
-  i++;
+  // Generează GIF-ul de tip 1 și 2
+  ["1", "2"].forEach(prefix => {
+    const name = `${prefix} (${current}).gif`;
+    const el = createBlinkie(name);
+    container.appendChild(el);
+    blinkies.push(el);
+  });
 
+  current++;
   requestAnimationFrame(addNextBlinkie);
 }
 
