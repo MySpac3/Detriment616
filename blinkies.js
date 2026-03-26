@@ -25,7 +25,7 @@ socials.insertAdjacentElement("afterend", section);
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
-// 🔥 CREATE BLINKIE ELEMENT (FAST LOADING)
+// 🔥 CREATE BLINKIE ELEMENT (LAZY LOADING)
 // =======================
 function createBlinkie(src) {
   const el = document.createElement("div");
@@ -35,30 +35,14 @@ function createBlinkie(src) {
   el.style.width = "100%";
 
   const img = document.createElement("img");
-  img.src = src;
+  img.dataset.src = src; // folosim data-src pentru lazy loading
   img.style.width = "100%";
   img.style.height = "auto";
   img.style.objectFit = "contain";
   img.style.maxWidth = "180px";
   img.style.maxHeight = "180px";
 
-  // Skip dacă nu există
   img.onerror = () => el.remove();
-
-  img.onload = () => {
-    const aspect = img.naturalWidth / img.naturalHeight;
-
-    if (window.innerWidth > 600) { 
-      // Desktop
-      if (aspect > 1.5) el.style.gridColumn = "span 4";
-      else if (aspect > 1.2) el.style.gridColumn = "span 2";
-      else el.style.gridColumn = "span 1";
-    } else {
-      // Mobil
-      if (aspect > 1.2) el.style.gridColumn = "span 2";
-      else el.style.gridColumn = "span 1";
-    }
-  };
 
   el.appendChild(img);
   return el;
@@ -70,7 +54,6 @@ function createBlinkie(src) {
 const blinkies = [];
 const fileNames = [];
 
-// Generăm toate numele posibile
 for (let base = 1; base <= 6; base++) {
   for (let i = 1; i <= 1000; i++) {
     fileNames.push(`${base} (${i}).gif`);
@@ -83,12 +66,47 @@ for (let i = fileNames.length - 1; i > 0; i--) {
   [fileNames[i], fileNames[j]] = [fileNames[j], fileNames[i]];
 }
 
-// Creăm și adăugăm blinkies (skip automat la inexistente)
+// Creăm și adăugăm blinkies
 fileNames.forEach(name => {
   const el = createBlinkie(name);
   container.appendChild(el);
   blinkies.push(el);
 });
+
+// =======================
+// 🔥 OBSERVER PENTRU LAZY LOADING
+// =======================
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const img = entry.target;
+      if (img.dataset.src) {
+        img.src = img.dataset.src;
+        img.onload = () => {
+          const aspect = img.naturalWidth / img.naturalHeight;
+          const el = img.parentElement;
+
+          if (window.innerWidth > 600) { 
+            // Desktop
+            if (aspect > 1.5) el.style.gridColumn = "span 4";
+            else if (aspect > 1.2) el.style.gridColumn = "span 2";
+            else el.style.gridColumn = "span 1";
+          } else {
+            // Mobil
+            if (aspect > 1.2) el.style.gridColumn = "span 2";
+            else el.style.gridColumn = "span 1";
+          }
+        };
+        img.removeAttribute('data-src');
+      }
+      observer.unobserve(img);
+    }
+  });
+}, {
+  rootMargin: "200px" // încărcăm puțin înainte să apară în viewport
+});
+
+blinkies.forEach(el => observer.observe(el.querySelector('img')));
 
 // =======================
 // 🔥 MULTICOLOR FLASHING TEXT "Blinkies"
