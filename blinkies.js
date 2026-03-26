@@ -32,7 +32,6 @@ style.textContent = `
   width: 100px;
   height: 100px;
   overflow: hidden;
-  position: relative;
 }
 
 /* container wide → ocupă tot rândul */
@@ -49,53 +48,29 @@ style.textContent = `
   object-fit: contain;
 }
 
-/* overlay text litere colorate random */
-.blinkie .overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  font-size: 14px;
-  font-weight: bold;
-  text-align: center;
-}
-
 /* FĂRĂ SCROLL ORIZONTAL SAU VERTICAL */
 html, body {
-  overflow-x: hidden;
-  overflow-y: auto; /* scroll vertical permis */
+  overflow: hidden; /* ascunde scroll bar */
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
 }
 
-/* SCROLL SUPER LENT */
+/* SCROLL SUPER LENT (LENOSENSIBILITATE MAXIMĂ) */
 body {
-  scroll-behavior: smooth; /* scroll lin și lent */
+  scroll-behavior: smooth;
   overscroll-behavior: contain;
+  scroll-snap-type: y mandatory;
   line-height: 1.6;
+}
+
+/* FLASH TEXT */
+h2 span {
+  transition: color 0.3s ease;
 }
 `;
 document.head.appendChild(style);
-
-// =======================
-// 🔥 HELPER: RANDOM COLOR
-// =======================
-function randomColor() {
-  const letters = "0123456789ABCDEF";
-  let color = "#";
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-}
 
 // =======================
 // 🔥 CREATE BLINKIE ELEMENT
@@ -109,24 +84,14 @@ function createBlinkie(src) {
 
   img.onload = () => {
     const aspect = img.naturalWidth / img.naturalHeight;
-    if (aspect > 1.4) el.classList.add("wide");
+    if (aspect > 1.4) {
+      el.classList.add("wide");
+    }
   };
 
   img.onerror = () => el.remove();
+
   el.appendChild(img);
-
-  // overlay litere colorate random
-  const overlay = document.createElement("div");
-  overlay.className = "overlay";
-  const letters = "EMOSCENE123!@#";
-  for (let i = 0; i < 5; i++) {
-    const span = document.createElement("span");
-    span.textContent = letters[Math.floor(Math.random() * letters.length)];
-    span.style.color = randomColor();
-    overlay.appendChild(span);
-  }
-  el.appendChild(overlay);
-
   return el;
 }
 
@@ -136,25 +101,42 @@ function createBlinkie(src) {
 function addBlinkieIfExists(src) {
   const test = new Image();
   test.src = src;
-  test.onload = () => container.appendChild(createBlinkie(src));
+
+  test.onload = () => {
+    const el = createBlinkie(src);
+    container.appendChild(el);
+  };
 }
 
 // =======================
 // 🔥 POPULARE
 // =======================
-for (let i = 1; i <= 250; i++) addBlinkieIfExists(`1 (${i}).gif`);
-for (let i = 1; i <= 200; i++) addBlinkieIfExists(`2 (${i}).gif`);
+
+// Folder 1 → 1–250
+for (let i = 1; i <= 250; i++) {
+  addBlinkieIfExists(`1 (${i}).gif`);
+}
+
+// Folder 2 → 1–200
+for (let i = 1; i <= 200; i++) {
+  addBlinkieIfExists(`2 (${i}).gif`);
+}
 
 // =======================
-// 🔥 FLASH TEXT BLINKIES (LITERE COLORATE RANDOM)
+// 🔥 FLASH TEXT RANDOM COLOR
 // =======================
 const title = section.querySelector("h2");
 const text = title.textContent;
-title.textContent = "";
+title.textContent = ""; // golim textul inițial
+
+function randomColor() {
+  // Generăm o culoare random în hex
+  return '#' + Math.floor(Math.random() * 16777215).toString(16);
+}
 
 for (let char of text) {
   const span = document.createElement("span");
   span.textContent = char;
-  span.style.color = randomColor();
+  span.style.color = randomColor(); // culoare random
   title.appendChild(span);
 }
