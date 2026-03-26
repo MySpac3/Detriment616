@@ -4,7 +4,7 @@
 const section = document.createElement("section");
 
 section.innerHTML = `
-<h2 style="text-align:center; margin-bottom:10px; font-family:inherit;">
+<h2 style="color:#ff00ff;text-align:center; margin-bottom:10px; font-family:inherit;">
   Blinkies
 </h2>
 
@@ -25,8 +25,6 @@ style.textContent = `
   justify-content: center;
   gap: 4px;
   margin: 10px 0 20px;
-  max-height: 80vh;
-  overflow: auto; /* scroll ascuns dar funcțional */
 }
 
 /* container normal */
@@ -50,18 +48,26 @@ style.textContent = `
   object-fit: contain;
 }
 
-/* ascunde scroll bar dar permite scroll */
-#blinkiesContainer::-webkit-scrollbar {
-  display: none;
+/* FĂRĂ SCROLL ORIZONTAL SAU VERTICAL */
+html, body {
+  overflow: hidden; /* ascunde scroll bar */
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
-#blinkiesContainer {
-  -ms-overflow-style: none;  /* IE și Edge */
-  scrollbar-width: none;     /* Firefox */
+
+/* SCROLL SUPER LENT (LENOSENSIBILITATE MAXIMĂ) */
+body {
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  scroll-snap-type: y mandatory;
+  line-height: 1.6;
 }
 
 /* FLASH TEXT */
 h2 span {
-  font-weight: bold;
+  color: #ff00ff;
 }
 `;
 document.head.appendChild(style);
@@ -117,26 +123,15 @@ for (let i = 1; i <= 200; i++) {
 }
 
 // =======================
-// 🔥 FLASH TEXT RANDOM COLORS
+// 🔥 FLASH TEXT (FIX)
 // =======================
 const title = section.querySelector("h2");
 const text = title.textContent;
 title.textContent = "";
 
-// Funcție care generează o culoare random
-function getRandomColor() {
-  const letters = "0123456789ABCDEF";
-  let color = "#";
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-}
-
-// Aplica culori random pentru fiecare literă
 for (let char of text) {
   const span = document.createElement("span");
   span.textContent = char;
-  span.style.color = getRandomColor(); // culoare random
+  span.style.color = "#ff00ff";
   title.appendChild(span);
 }
