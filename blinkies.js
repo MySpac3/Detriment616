@@ -134,4 +134,4 @@ for (let char of text) {
   span.textContent = char;
   span.style.color = "#ff00ff";
   title.appendChild(span);
-}        
+}
