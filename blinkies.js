@@ -4,15 +4,16 @@
 const section = document.createElement("section");
 
 section.innerHTML = `
-<h2 style="color:#ff00ff;text-align:center;position:relative;z-index:10;text-align:center;">
+<h2 style="color:#ff00ff;text-align:center;z-index:10;position:relative;">
   Blinkies
 </h2>
 
 <div id="blinkiesContainer" style="
-  position:relative;
-  width:100%;
-  height:100vh;
-  overflow:hidden;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  justify-content:center;
+  align-items:flex-start;
   margin-top:15px;
   margin-bottom:20px;
 "></div>
@@ -24,34 +25,25 @@ socials.insertAdjacentElement("afterend", section);
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
-// 🔥 CREATE BLINKIE ELEMENT (DIMENSIUNE AUTOMATĂ, RANDOM)
+// 🔥 CREATE BLINKIE ELEMENT (DIMENSIUNE CONTROLATĂ)
 // =======================
 function createBlinkie(src) {
   const el = document.createElement("div");
-  el.style.position = "absolute";
-  el.style.transition = "0.3s";
-  
+  el.style.display = "flex";
+  el.style.alignItems = "center";
+  el.style.justifyContent = "center";
+  el.style.borderRadius = "4px";
+  el.style.transition = "0.1s";
+  el.style.overflow = "hidden";
+
   const img = document.createElement("img");
   img.src = src;
   img.style.display = "block";
   img.style.width = "auto";
   img.style.height = "auto";
-  img.style.maxWidth = "200px";  // optional
-  img.style.maxHeight = "200px"; // optional
+  img.style.maxWidth = "150px";  // controlăm dimensiunea ca să încapă 3+ pe rând
+  img.style.maxHeight = "150px";
   img.onerror = () => el.remove();
-
-  img.onload = () => {
-    // Poziție random în container
-    const maxX = container.clientWidth - img.naturalWidth;
-    const maxY = container.clientHeight - img.naturalHeight;
-    el.style.left = Math.random() * (maxX > 0 ? maxX : 0) + "px";
-    el.style.top = Math.random() * (maxY > 0 ? maxY : 0) + "px";
-
-    // Redimensionare aleator pentru efect mosaic
-    const scale = 0.3 + Math.random() * 0.7; // 30%-100%
-    img.style.width = img.naturalWidth * scale + "px";
-    img.style.height = img.naturalHeight * scale + "px";
-  };
 
   el.appendChild(img);
   container.appendChild(el);
