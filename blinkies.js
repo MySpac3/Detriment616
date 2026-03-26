@@ -10,13 +10,11 @@ section.innerHTML = `
 
 <div id="blinkiesContainer" style="
   display:grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(10, 100px); /* 10 coloane fixe */
   gap:2px;
-  justify-items:center;
-  align-items:start;
+  justify-content:center;
   margin-top:10px;
   margin-bottom:20px;
-  grid-auto-rows: 180px;
 "></div>
 `;
 
@@ -24,23 +22,19 @@ document.getElementById("socialsSection").insertAdjacentElement("afterend", sect
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
-// 🔥 CREATE BLINKIE ELEMENT (FIXED, LAZY)
+// 🔥 CREATE BLINKIE ELEMENT
 // =======================
 function createBlinkie(src) {
   const el = document.createElement("div");
-  el.style.display = "flex";
-  el.style.alignItems = "center";
-  el.style.justifyContent = "center";
-  el.style.width = "100%";
-  el.style.height = "100%";
+  el.style.width = "100px";
+  el.style.height = "100px";
+  el.style.overflow = "hidden";
 
   const img = document.createElement("img");
   img.dataset.src = src;
-  img.style.maxWidth = "100%";
-  img.style.maxHeight = "100%";
+  img.style.width = "100%";
+  img.style.height = "100%";
   img.style.objectFit = "contain";
-
-  // Dacă GIF-ul nu există, eliminăm containerul
   img.onerror = () => el.remove();
 
   el.appendChild(img);
@@ -48,27 +42,18 @@ function createBlinkie(src) {
 }
 
 // =======================
-// 🔥 FIXED LIST OF GIFS
+// 🔥 GENERATE FILE NAMES (FIX ORDER, FĂRĂ RANDOM)
 // =======================
 const blinkies = [];
 const fileNames = [];
 
-// 1 (1-250).gif
-for (let i = 1; i <= 250; i++) {
-  fileNames.push(`1 (${i}).gif`);
+for (let base = 1; base <= 6; base++) {
+  for (let i = 1; i <= 1000; i++) {
+    fileNames.push(`${base} (${i}).gif`);
+  }
 }
 
-// 2 (1-200).gif
-for (let i = 1; i <= 200; i++) {
-  fileNames.push(`2 (${i}).gif`);
-}
-
-// Poți adăuga alte seturi dacă vrei:
-// for (let i = 1; i <= 150; i++) fileNames.push(`3 (${i}).gif`);
-
-// =======================
-// 🔥 CREATE CELLS FIXED ORDER
-// =======================
+// Add blinkies in order
 fileNames.forEach(name => {
   const el = createBlinkie(name);
   container.appendChild(el);
@@ -89,12 +74,12 @@ const observer = new IntersectionObserver((entries) => {
       observer.unobserve(img);
     }
   });
-}, { rootMargin: "5px" }); // încărcare rapidă
+}, { rootMargin: "5px" });
 
 blinkies.forEach(el => observer.observe(el.querySelector('img')));
 
 // =======================
-// 🔥 FLASHING TEXT MINIM
+// 🔥 FLASHING TEXT
 // =======================
 const title = section.querySelector("h2");
 const text = title.textContent;
@@ -108,8 +93,7 @@ for (let char of text) {
 
 function flashText() {
   title.querySelectorAll('span').forEach(span => {
-    if (Math.random() < 0.3)
-      span.style.color = `rgb(${Math.random()*255|0},${Math.random()*255|0},${Math.random()*255|0})`;
+    if (Math.random() < 0.3) span.style.color = `rgb(${Math.random()*255|0},${Math.random()*255|0},${Math.random()*255|0})`;
   });
   requestAnimationFrame(flashText);
 }
@@ -122,9 +106,9 @@ const style = document.createElement("style");
 style.textContent = `
 @media (max-width: 600px) {
   #blinkiesContainer {
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    grid-template-columns: repeat(5, 80px);
     gap: 1px;
   }
 }
 `;
-document.head.appendChild(style);
+document.head.appendChild(style);  
