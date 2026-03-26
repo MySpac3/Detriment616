@@ -10,7 +10,7 @@ section.innerHTML = `
 
 <div id="blinkiesContainer" style="
   display:grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, 1fr); /* desktop */
   gap:2px;
   justify-items:center;
   align-items:start;
@@ -45,12 +45,23 @@ function createBlinkie(src) {
 
   img.onload = () => {
     const aspect = img.naturalWidth / img.naturalHeight;
-    if (aspect > 1.5) { // foarte orizontal
-      el.style.gridColumn = "span 4"; 
-    } else if (aspect > 1.2) { // orizontal
-      el.style.gridColumn = "span 2"; 
-    } else { // vertical sau pătrat
-      el.style.gridColumn = "span 1";
+
+    if (window.innerWidth > 600) { 
+      // Desktop
+      if (aspect > 1.5) { 
+        el.style.gridColumn = "span 4";
+      } else if (aspect > 1.2) {
+        el.style.gridColumn = "span 2";
+      } else {
+        el.style.gridColumn = "span 1";
+      }
+    } else {
+      // Mobil
+      if (aspect > 1.2) {
+        el.style.gridColumn = "span 2"; // ocupa două coloane pe mobil
+      } else {
+        el.style.gridColumn = "span 1"; // vertical / pătrat
+      }
     }
   };
 
