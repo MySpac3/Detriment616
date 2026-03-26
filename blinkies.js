@@ -4,18 +4,20 @@
 const section = document.createElement("section");
 
 section.innerHTML = `
-<h2 style="color:#ff00ff;text-align:center;">
+<h2 style="color:#ff00ff;text-align:center; margin-bottom:15px;">
   Blinkies
 </h2>
 
 <div id="blinkiesContainer" style="
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-  gap:4px;
+  grid-template-columns: repeat(4, 1fr); /* maxim 4 pe rând */
+  gap:8px;
   justify-items:center;
-  align-items:center;
+  align-items:start;
   margin-top:15px;
   margin-bottom:20px;
+  overflow-y:auto;
+  max-height:80vh; /* scroll vertical */
 "></div>
 `;
 
@@ -40,22 +42,26 @@ function createBlinkie(src) {
   img.style.width = "100%";
   img.style.height = "auto";
   img.style.objectFit = "contain";
-  img.style.maxWidth = "120px"; // dublu față de 60px
-  img.style.maxHeight = "120px"; // dublu față de 60px
-  img.onerror = () => el.remove(); // elimină fișierele inexistente
+  img.style.maxWidth = "180px"; // 1.5x față de 120px anterior
+  img.style.maxHeight = "180px"; 
+  img.onerror = () => el.remove();
 
-  // Ajustăm dimensiunea după încărcare, în funcție de proporții
   img.onload = () => {
     const aspect = img.naturalWidth / img.naturalHeight;
-    if (aspect > 1.2) { // GIF orizontal
+    if (aspect > 1.5) { // foarte orizontal
+      el.style.gridColumn = "span 4"; // ocupă tot rândul
       img.style.width = "100%";
       img.style.height = "auto";
-    } else if (aspect < 0.8) { // GIF vertical
-      img.style.height = "120px";
+    } else if (aspect > 1.2) { // orizontal
+      el.style.gridColumn = "span 2"; // ocupă 2 coloane
+      img.style.width = "100%";
+      img.style.height = "auto";
+    } else if (aspect < 0.8) { // vertical
+      img.style.height = "180px";
       img.style.width = "auto";
     } else { // aproape pătrat
-      img.style.width = "120px";
-      img.style.height = "120px";
+      img.style.width = "180px";
+      img.style.height = "180px";
     }
   };
 
