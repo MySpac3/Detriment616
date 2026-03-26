@@ -80,15 +80,15 @@
     50% {opacity: 0;}
   }
    
-  /* MAIN CONTAINER */
-  #mainContent {
-    display: none;
-    min-height: 100vh;
-    background: linear-gradient(180deg, #1a001a 0%, #000000 100%);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    position: relative;
-  }
+ /* MAIN CONTENT FULLSCREEN */
+#mainContent {
+  display: none;
+  height: 100%;
+  width: 100%;
+  overflow-y: auto; /* poți păstra scroll dacă ai conținut mai lung */
+  background: linear-gradient(180deg, #1a001a 0%, #000000 100%);
+  position: relative;
+}
 #matrixCanvas {
   position: fixed;
   inset: 0;
