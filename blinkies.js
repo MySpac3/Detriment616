@@ -10,22 +10,20 @@ section.innerHTML = `
 
 <div id="blinkiesContainer" style="
   display:grid;
-  grid-template-columns: repeat(4, 1fr); /* desktop */
-  gap:2px; /* minim spațiu intre GIF-uri */
+  grid-template-columns: repeat(4, 1fr);
+  gap:2px;
   justify-items:center;
   align-items:start;
   margin-top:10px;
   margin-bottom:20px;
   overflow-y:auto;
-  max-height:80vh; /* scroll vertical */
-  grid-auto-rows: min-content; /* fiecare GIF isi ia inaltimea proprie */
+  max-height:80vh;
+  grid-auto-rows: min-content;
 "></div>
 `;
 
-// Inseram sectiunea dupa socials
 const socials = document.getElementById("socialsSection");
 socials.insertAdjacentElement("afterend", section);
-
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
@@ -36,24 +34,23 @@ function createBlinkie(src) {
   el.style.display = "flex";
   el.style.alignItems = "center";
   el.style.justifyContent = "center";
-  el.style.transition = "0.1s";
   el.style.width = "100%";
 
   const img = document.createElement("img");
   img.src = src;
-  img.style.width = "100%"; 
+  img.style.width = "100%";
   img.style.height = "auto";
   img.style.objectFit = "contain";
-  img.style.maxWidth = "180px"; 
-  img.style.maxHeight = "180px"; 
+  img.style.maxWidth = "180px";
+  img.style.maxHeight = "180px";
   img.onerror = () => el.remove();
 
   img.onload = () => {
     const aspect = img.naturalWidth / img.naturalHeight;
     if (aspect > 1.5) { // foarte orizontal
-      el.style.gridColumn = "span 4"; // ocupă tot rândul
+      el.style.gridColumn = "span 4"; 
     } else if (aspect > 1.2) { // orizontal
-      el.style.gridColumn = "span 2"; // ocupă 2 coloane
+      el.style.gridColumn = "span 2"; 
     } else { // vertical sau pătrat
       el.style.gridColumn = "span 1";
     }
@@ -64,33 +61,30 @@ function createBlinkie(src) {
 }
 
 // =======================
-// 🔥 GENERATE BLINKIES 1-6 NUMEROTATE
+// 🔥 GENERATE RANDOMIZED BLINKIES
 // =======================
 const blinkies = [];
+const fileNames = [];
 
+// Generăm toate numele
 for (let base = 1; base <= 6; base++) {
   for (let i = 1; i <= 1000; i++) {
-    const name = `${base} (${i}).gif`;
-    const el = createBlinkie(name);
-    container.appendChild(el);
-    blinkies.push(el);
+    fileNames.push(`${base} (${i}).gif`);
   }
 }
 
-// =======================
-// 🔥 FLASH EFFECT FOR BLINKIES
-// =======================
-function flashBlinkies() {
-  blinkies.forEach(el => {
-    if (Math.random() < 0.05) {
-      el.style.opacity = "0.2";
-      setTimeout(() => { el.style.opacity = "1"; }, 100 + Math.random() * 200);
-    }
-  });
-  requestAnimationFrame(flashBlinkies);
+// Shuffle array aleator
+for (let i = fileNames.length - 1; i > 0; i--) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [fileNames[i], fileNames[j]] = [fileNames[j], fileNames[i]];
 }
 
-flashBlinkies();
+// Creăm și adăugăm blinkies
+fileNames.forEach(name => {
+  const el = createBlinkie(name);
+  container.appendChild(el);
+  blinkies.push(el);
+});
 
 // =======================
 // 🔥 MULTICOLOR FLASHING TEXT "Blinkies"
@@ -133,8 +127,8 @@ const style = document.createElement("style");
 style.textContent = `
 @media (max-width: 600px) {
   #blinkiesContainer {
-    grid-template-columns: repeat(2, 1fr); /* 2 GIF-uri pe rând pe telefon */
-    gap: 1px; /* spatiu minim */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
   }
 }
 `;
