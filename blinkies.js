@@ -1,5 +1,5 @@
 // =======================
-// 🔥 CREATE BLINKIES SECTION
+// 🔥 CREATE SECTION
 // =======================
 const section = document.createElement("section");
 
@@ -35,40 +35,34 @@ function createBlinkie(src) {
   el.style.justifyContent = "center";
   el.style.borderRadius = "4px";
   el.style.transition = "0.1s";
-  el.style.overflow = "hidden";
+  el.style.overflow = "hidden"; // să nu depășească containerul
 
   const img = document.createElement("img");
   img.src = src;
-
-  img.onload = () => {
-    el.style.width = img.naturalWidth + "px";
-    el.style.height = img.naturalHeight + "px";
-  };
-
-  img.onerror = () => el.remove();
+  img.style.maxHeight = "120px"; // limitează înălțimea, păstrează proporțiile
+  img.style.maxWidth = "120px";  // limitează lățimea
+  img.style.objectFit = "contain"; // păstrează dimensiunea originală
+  img.onerror = () => el.remove(); // elimină fișierele inexistente
 
   el.appendChild(img);
   return el;
 }
 
 // =======================
-// 🔥 GENERATE 1-300 FOR BOTH TYPES
+// 🔥 GENERATE GIFS FROM 1 TO 1000
 // =======================
 const blinkies = [];
-let current = 1;
-const total = 300;
+let i = 1;
 
 function addNextBlinkie() {
-  if (current > total) return;
+  if (i > 1000) return;
 
-  ["1", "2"].forEach(prefix => {
-    const name = `${prefix} (${current}).gif`;
-    const el = createBlinkie(name);
-    container.appendChild(el);
-    blinkies.push(el);
-  });
+  const name = `1 (${i}).gif`;
+  const el = createBlinkie(name);
+  container.appendChild(el);
+  blinkies.push(el);
+  i++;
 
-  current++;
   requestAnimationFrame(addNextBlinkie);
 }
 
