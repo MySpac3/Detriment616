@@ -16,7 +16,7 @@ section.innerHTML = `
   align-items:start;
   margin-top:10px;
   margin-bottom:20px;
-  grid-auto-rows: 180px; /* fixăm înălțimea celulelor */
+  grid-auto-rows: 180px;
 "></div>
 `;
 
@@ -24,7 +24,7 @@ document.getElementById("socialsSection").insertAdjacentElement("afterend", sect
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
-// 🔥 CREATE BLINKIE ELEMENT (FIXED POSITION, LAZY)
+// 🔥 CREATE BLINKIE ELEMENT (FIXED, LAZY)
 // =======================
 function createBlinkie(src) {
   const el = document.createElement("div");
@@ -32,13 +32,15 @@ function createBlinkie(src) {
   el.style.alignItems = "center";
   el.style.justifyContent = "center";
   el.style.width = "100%";
-  el.style.height = "100%"; // forțăm să ocupe întreaga celulă
+  el.style.height = "100%";
 
   const img = document.createElement("img");
   img.dataset.src = src;
   img.style.maxWidth = "100%";
   img.style.maxHeight = "100%";
   img.style.objectFit = "contain";
+
+  // Dacă GIF-ul nu există, eliminăm containerul
   img.onerror = () => el.remove();
 
   el.appendChild(img);
@@ -46,33 +48,32 @@ function createBlinkie(src) {
 }
 
 // =======================
-// 🔥 GENERATE FILE NAMES + SHUFFLE
+// 🔥 FIXED LIST OF GIFS
 // =======================
 const blinkies = [];
 const fileNames = [];
 
-// 6 seturi x 1000 GIF-uri
-for (let base = 1; base <= 6; base++) {
-  for (let i = 1; i <= 1000; i++) {
-    fileNames.push(`${base} (${i}).gif`);
-  }
+// 1 (1-250).gif
+for (let i = 1; i <= 250; i++) {
+  fileNames.push(`1 (${i}).gif`);
 }
 
-// Shuffle array-ul complet, astfel încât ordinea să nu fie de la 1 la 1000
-for (let i = fileNames.length - 1; i > 0; i--) {
-  const j = Math.floor(Math.random() * (i + 1));
-  [fileNames[i], fileNames[j]] = [fileNames[j], fileNames[i]];
+// 2 (1-200).gif
+for (let i = 1; i <= 200; i++) {
+  fileNames.push(`2 (${i}).gif`);
 }
 
+// Poți adăuga alte seturi dacă vrei:
+// for (let i = 1; i <= 150; i++) fileNames.push(`3 (${i}).gif`);
+
 // =======================
-// 🔥 FIXED CELLS (NUMĂR FIX DE CELULE)
+// 🔥 CREATE CELLS FIXED ORDER
 // =======================
-const totalCells = 24; // câte celule dorim să afișăm
-for (let i = 0; i < totalCells; i++) {
-  const el = createBlinkie(fileNames[i]); // folosim GIF-urile amestecate în ordine fixă
+fileNames.forEach(name => {
+  const el = createBlinkie(name);
   container.appendChild(el);
   blinkies.push(el);
-}
+});
 
 // =======================
 // 🔥 LAZY LOADING OBSERVER
@@ -88,12 +89,12 @@ const observer = new IntersectionObserver((entries) => {
       observer.unobserve(img);
     }
   });
-}, { rootMargin: "10px" }); // scroll mai puțin sensibil
+}, { rootMargin: "5px" }); // încărcare rapidă
 
 blinkies.forEach(el => observer.observe(el.querySelector('img')));
 
 // =======================
-// 🔥 FLASHING TEXT (MINIM)
+// 🔥 FLASHING TEXT MINIM
 // =======================
 const title = section.querySelector("h2");
 const text = title.textContent;
