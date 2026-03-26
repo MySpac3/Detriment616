@@ -16,15 +16,16 @@ section.innerHTML = `
   align-items:start;
   margin-top:10px;
   margin-bottom:20px;
-  grid-auto-rows: 180px;
+  grid-auto-rows: min-content;
 "></div>
 `;
 
-document.getElementById("socialsSection").insertAdjacentElement("afterend", section);
+const socials = document.getElementById("socialsSection");
+socials.insertAdjacentElement("afterend", section);
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
-// 🔥 CREATE BLINKIE ELEMENT (FIXED, LAZY)
+// 🔥 CREATE BLINKIE ELEMENT (LAZY LOADING)
 // =======================
 function createBlinkie(src) {
   const el = document.createElement("div");
@@ -32,15 +33,15 @@ function createBlinkie(src) {
   el.style.alignItems = "center";
   el.style.justifyContent = "center";
   el.style.width = "100%";
-  el.style.height = "100%";
 
   const img = document.createElement("img");
-  img.dataset.src = src;
-  img.style.maxWidth = "100%";
-  img.style.maxHeight = "100%";
+  img.dataset.src = src; // folosim data-src pentru lazy loading
+  img.style.width = "100%";
+  img.style.height = "auto";
   img.style.objectFit = "contain";
+  img.style.maxWidth = "180px";
+  img.style.maxHeight = "180px";
 
-  // Dacă GIF-ul nu există, eliminăm containerul
   img.onerror = () => el.remove();
 
   el.appendChild(img);
@@ -48,27 +49,24 @@ function createBlinkie(src) {
 }
 
 // =======================
-// 🔥 FIXED LIST OF GIFS
+// 🔥 GENERATE RANDOMIZED BLINKIES
 // =======================
 const blinkies = [];
 const fileNames = [];
 
-// 1 (1-250).gif
-for (let i = 1; i <= 250; i++) {
-  fileNames.push(`1 (${i}).gif`);
+for (let base = 1; base <= 6; base++) {
+  for (let i = 1; i <= 1000; i++) {
+    fileNames.push(`${base} (${i}).gif`);
+  }
 }
 
-// 2 (1-200).gif
-for (let i = 1; i <= 200; i++) {
-  fileNames.push(`2 (${i}).gif`);
+// Shuffle array aleator
+for (let i = fileNames.length - 1; i > 0; i--) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [fileNames[i], fileNames[j]] = [fileNames[j], fileNames[i]];
 }
 
-// Poți adăuga alte seturi dacă vrei:
-// for (let i = 1; i <= 150; i++) fileNames.push(`3 (${i}).gif`);
-
-// =======================
-// 🔥 CREATE CELLS FIXED ORDER
-// =======================
+// Creăm și adăugăm blinkies
 fileNames.forEach(name => {
   const el = createBlinkie(name);
   container.appendChild(el);
@@ -76,7 +74,7 @@ fileNames.forEach(name => {
 });
 
 // =======================
-// 🔥 LAZY LOADING OBSERVER
+// 🔥 OBSERVER PENTRU LAZY LOADING
 // =======================
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
@@ -84,45 +82,74 @@ const observer = new IntersectionObserver((entries) => {
       const img = entry.target;
       if (img.dataset.src) {
         img.src = img.dataset.src;
+        img.onload = () => {
+          const aspect = img.naturalWidth / img.naturalHeight;
+          const el = img.parentElement;
+
+          if (window.innerWidth > 600) { 
+            // Desktop
+            if (aspect > 1.5) el.style.gridColumn = "span 4";
+            else if (aspect > 1.2) el.style.gridColumn = "span 2";
+            else el.style.gridColumn = "span 1";
+          } else {
+            // Mobil
+            if (aspect > 1.2) el.style.gridColumn = "span 2";
+            else el.style.gridColumn = "span 1";
+          }
+        };
         img.removeAttribute('data-src');
       }
       observer.unobserve(img);
     }
   });
-}, { rootMargin: "5px" }); // încărcare rapidă
+}, {
+  rootMargin: "200px" // încărcăm puțin înainte să apară în viewport
+});
 
 blinkies.forEach(el => observer.observe(el.querySelector('img')));
 
 // =======================
-// 🔥 FLASHING TEXT MINIM
+// 🔥 MULTICOLOR FLASHING TEXT "Blinkies"
 // =======================
 const title = section.querySelector("h2");
 const text = title.textContent;
 title.textContent = "";
+const lettersArray = [];
 
 for (let char of text) {
   const span = document.createElement("span");
   span.textContent = char;
   title.appendChild(span);
+  lettersArray.push(span);
+}
+
+function randomColor() {
+  const r = Math.floor(Math.random() * 256);
+  const g = Math.floor(Math.random() * 256);
+  const b = Math.floor(Math.random() * 256);
+  return `rgb(${r},${g},${b})`;
 }
 
 function flashText() {
-  title.querySelectorAll('span').forEach(span => {
-    if (Math.random() < 0.3)
-      span.style.color = `rgb(${Math.random()*255|0},${Math.random()*255|0},${Math.random()*255|0})`;
+  lettersArray.forEach(span => {
+    if (Math.random() < 0.3) {
+      span.style.color = randomColor();
+      span.style.opacity = Math.random() < 0.5 ? "0.2" : "1";
+    }
   });
   requestAnimationFrame(flashText);
 }
+
 flashText();
 
 // =======================
-// 🔥 MEDIA QUERY MOBILE
+// 🔥 MEDIA QUERY PENTRU TELEFON
 // =======================
 const style = document.createElement("style");
 style.textContent = `
 @media (max-width: 600px) {
   #blinkiesContainer {
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 1px;
   }
 }
