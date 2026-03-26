@@ -9,11 +9,12 @@ section.innerHTML = `
 </h2>
 
 <div id="blinkiesContainer" style="
-  width:100%;
-  display:flex;
-  flex-wrap:wrap;
-  align-items:flex-start;
-  margin-top:10px;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
+  gap:4px;
+  justify-items:center;
+  align-items:center;
+  margin-top:15px;
   margin-bottom:20px;
 "></div>
 `;
@@ -27,34 +28,23 @@ const container = document.getElementById("blinkiesContainer");
 // 🔥 CREATE BLINKIE ELEMENT
 // =======================
 function createBlinkie(src) {
-  const el = document.createElement("img");
-  el.src = src;
-  el.style.width = `${30 + Math.random()*40}px`; // lățime variabilă 30-70px
-  el.style.height = "auto"; // păstrează proporția GIF-ului
-  el.style.margin = "2px";
-  el.style.borderRadius = "4px";
-  el.style.transition = "0.2s";
-  el.style.cursor = "pointer";
-  el.style.display = "block";
-  el.onerror = () => el.remove();
+  const el = document.createElement("div");
+  el.style.display = "flex";
+  el.style.alignItems = "center";
+  el.style.justifyContent = "center";
+  el.style.transition = "0.1s";
+
+  const img = document.createElement("img");
+  img.src = src;
+  img.style.height = "auto";
+  img.style.width = "100%";
+  img.style.maxWidth = "60px"; // poate fi ajustat
+  img.style.maxHeight = "60px"; // poate fi ajustat
+  img.style.objectFit = "contain";
+  img.onerror = () => el.remove(); // elimină fișierele inexistente
+
+  el.appendChild(img);
   return el;
-}
-
-// =======================
-// 🔥 MASONRY / PUZZLE LAYOUT
-// =======================
-function layoutMasonry() {
-  const columns = Math.floor(container.clientWidth / 50); // aproximativ 50px pe coloană
-  const colHeights = Array(columns).fill(0);
-
-  blinkies.forEach(img => {
-    const col = colHeights.indexOf(Math.min(...colHeights)); // coloana cea mai scurtă
-    img.style.order = col; // folosit de flex-wrap pentru ordine
-    colHeights[col] += img.height + 4; // adaugăm margin
-  });
-
-  // Ajustăm înălțimea containerului
-  container.style.height = Math.max(...colHeights) + "px";
 }
 
 // =======================
@@ -63,21 +53,13 @@ function layoutMasonry() {
 const blinkies = [];
 
 for (let base = 1; base <= 6; base++) {
-  for (let i = 1; i <= 200; i++) {
+  for (let i = 1; i <= 1000; i++) {
     const name = `${base} (${i}).gif`;
     const el = createBlinkie(name);
     container.appendChild(el);
     blinkies.push(el);
-
-    // Re-layout când imaginea se încarcă
-    el.onload = layoutMasonry;
   }
 }
-
-// Re-layout la resize
-window.addEventListener("resize", () => {
-  layoutMasonry();
-});
 
 // =======================
 // 🔥 FLASH EFFECT FOR BLINKIES
@@ -91,6 +73,7 @@ function flashBlinkies() {
   });
   requestAnimationFrame(flashBlinkies);
 }
+
 flashBlinkies();
 
 // =======================
@@ -124,4 +107,5 @@ function flashText() {
   });
   requestAnimationFrame(flashText);
 }
+
 flashText();
