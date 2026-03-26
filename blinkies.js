@@ -4,74 +4,46 @@
 const section = document.createElement("section");
 
 section.innerHTML = `
-<h2 style="color:#ff00ff;text-align:center;position:relative;z-index:10;">
+<h2 style="color:#ff00ff;text-align:center;">
   Blinkies
 </h2>
 
 <div id="blinkiesContainer" style="
   display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(30px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(30px, 1fr));
   gap:2px;
   justify-items:center;
-  align-items:start;
-  width:100%;
-  margin-top:15px;
+  align-items:center;
+  margin-top:10px;
   margin-bottom:20px;
-  max-height:70vh; /* rezervă zona pentru sânge */
-  overflow:hidden;
-  position:relative;
-"></div>
-
-<canvas id="bloodEffect" style="
-  position:fixed;
-  top:0;
-  left:0;
   width:100%;
-  height:100%;
-  pointer-events:none;
-  z-index:5;
-"></canvas>
+"></div>
 `;
 
 const socials = document.getElementById("socialsSection");
 socials.insertAdjacentElement("afterend", section);
 
 const container = document.getElementById("blinkiesContainer");
-const canvas = document.getElementById("bloodEffect");
-const ctx = canvas.getContext("2d");
-
-// =======================
-// 🔥 RESIZE CANVAS
-// =======================
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
 
 // =======================
 // 🔥 CREATE BLINKIE ELEMENT
 // =======================
 function createBlinkie(src) {
   const el = document.createElement("div");
-  el.style.width = "100%";
-  el.style.display = "flex";
-  el.style.alignItems = "center";
-  el.style.justifyContent = "center";
+  el.style.width = "100%";  // se umple celula din grid
+  el.style.aspectRatio = "1"; // pătrat perfect
   el.style.borderRadius = "4px";
   el.style.overflow = "hidden";
   el.style.transition = "0.1s";
 
   const img = document.createElement("img");
   img.src = src;
-  img.style.display = "block";
   img.style.width = "100%";
-  img.style.height = "auto";
-  img.onerror = () => el.remove();
+  img.style.height = "100%";
+  img.style.objectFit = "cover";
+  img.onerror = () => el.remove(); // elimină fișierele inexistente
 
   el.appendChild(img);
-  container.appendChild(el);
   return el;
 }
 
@@ -79,10 +51,12 @@ function createBlinkie(src) {
 // 🔥 GENERATE BLINKIES 1-6 NUMEROTATE
 // =======================
 const blinkies = [];
+
 for (let base = 1; base <= 6; base++) {
-  for (let i = 1; i <= 500; i++) { // reducem la 500 pentru telefon, ca să nu fie lag
+  for (let i = 1; i <= 1000; i++) {
     const name = `${base} (${i}).gif`;
     const el = createBlinkie(name);
+    container.appendChild(el);
     blinkies.push(el);
   }
 }
@@ -108,18 +82,21 @@ const title = section.querySelector("h2");
 const text = title.textContent;
 title.textContent = "";
 const lettersArray = [];
+
 for (let char of text) {
   const span = document.createElement("span");
   span.textContent = char;
   title.appendChild(span);
   lettersArray.push(span);
 }
+
 function randomColor() {
   const r = Math.floor(Math.random() * 256);
   const g = Math.floor(Math.random() * 256);
   const b = Math.floor(Math.random() * 256);
   return `rgb(${r},${g},${b})`;
 }
+
 function flashText() {
   lettersArray.forEach(span => {
     if (Math.random() < 0.3) {
@@ -130,38 +107,3 @@ function flashText() {
   requestAnimationFrame(flashText);
 }
 flashText();
-
-// =======================
-// 🔥 BLOOD EFFECT
-// =======================
-const drops = [];
-function createDrop() {
-  const x = Math.random() * canvas.width;
-  const y = -10;
-  const radius = 5 + Math.random() * 10;
-  const speed = 2 + Math.random() * 3;
-  drops.push({x, y, radius, speed});
-}
-
-function updateDrops() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  drops.forEach((drop, index) => {
-    ctx.beginPath();
-    ctx.fillStyle = "rgba(200,0,0,0.6)";
-    ctx.arc(drop.x, drop.y, drop.radius, 0, Math.PI * 2);
-    ctx.fill();
-
-    drop.y += drop.speed;
-
-    // Se șterge drop-ul dacă ajunge sub container
-    if(drop.y > canvas.height - container.clientHeight) drops.splice(index, 1);
-  });
-}
-
-function animateBlood() {
-  if(Math.random() < 0.2) createDrop();
-  updateDrops();
-  requestAnimationFrame(animateBlood);
-}
-animateBlood();
