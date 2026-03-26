@@ -15,7 +15,7 @@ document.getElementById("socialsSection").insertAdjacentElement("afterend", sect
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
-// 🔥 GRID STYLE
+// 🔥 GRID STYLE (CURAT)
 // =======================
 const style = document.createElement("style");
 style.textContent = `
@@ -27,27 +27,35 @@ style.textContent = `
   margin: 10px 0 20px;
 }
 
+/* container normal */
 .blinkie {
   width: 100px;
   height: 100px;
   overflow: hidden;
 }
 
+/* wide → 1 pe rând */
 .blinkie.wide {
   grid-column: span 3;
   width: 100%;
   height: 100px;
 }
 
+/* imagine */
 .blinkie img {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
+/* ❗ IMPORTANT: fără scroll orizontal */
 html, body {
   overflow-x: hidden;
-  touch-action: none; /* IMPORTANT pentru control total touch */
+}
+
+/* scroll natural, fără modificări */
+body {
+  overscroll-behavior-y: auto;
 }
 `;
 document.head.appendChild(style);
@@ -64,7 +72,10 @@ function createBlinkie(src) {
 
   img.onload = () => {
     const aspect = img.naturalWidth / img.naturalHeight;
-    if (aspect > 1.4) el.classList.add("wide");
+
+    if (aspect > 1.4) {
+      el.classList.add("wide"); // stacked dacă e wide
+    }
   };
 
   img.onerror = () => el.remove();
@@ -85,18 +96,22 @@ function addBlinkieIfExists(src) {
   };
 }
 
-// Folder 1
+// =======================
+// 🔥 POPULARE
+// =======================
+
+// Folder 1 → 1–250
 for (let i = 1; i <= 250; i++) {
   addBlinkieIfExists(`1 (${i}).gif`);
 }
 
-// Folder 2
+// Folder 2 → 1–200
 for (let i = 1; i <= 200; i++) {
   addBlinkieIfExists(`2 (${i}).gif`);
 }
 
 // =======================
-// 🔥 FLASH TEXT
+// 🔥 FLASH TEXT FIX
 // =======================
 const title = section.querySelector("h2");
 const text = title.textContent;
@@ -108,32 +123,3 @@ for (let char of text) {
   span.style.color = "#ff00ff";
   title.appendChild(span);
 }
-
-// =======================
-// 🔥 TOUCH SCROLL CONTROL (ULTRA SLOW)
-// =======================
-let lastY = 0;
-let currentY = window.scrollY;
-
-const SCROLL_FACTOR = 0.2; // 🔥 mai mic = mai lent (poți pune 0.1 pentru EXTREM lent)
-
-window.addEventListener("touchstart", (e) => {
-  lastY = e.touches[0].clientY;
-});
-
-window.addEventListener("touchmove", (e) => {
-  e.preventDefault(); // oprim scroll-ul default
-
-  const currentTouchY = e.touches[0].clientY;
-  const delta = lastY - currentTouchY;
-
-  // aplicăm damping (încetinire)
-  currentY += delta * SCROLL_FACTOR;
-
-  // limitări (nu ieșim din pagină)
-  currentY = Math.max(0, Math.min(currentY, document.body.scrollHeight - window.innerHeight));
-
-  window.scrollTo(0, currentY);
-
-  lastY = currentTouchY;
-}, { passive: false });
