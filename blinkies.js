@@ -4,11 +4,18 @@
 const section = document.createElement("section");
 
 section.innerHTML = `
-<h2 style="color:#ff00ff;text-align:center; margin-bottom:10px; font-family:inherit;">
+<h2 id="blinkiesTitle" style="text-align:center; margin-bottom:10px; font-family:inherit;">
   Blinkies
 </h2>
 
-<div id="blinkiesContainer"></div>
+<div id="blinkiesContainerWrapper" style="
+  max-height: 400px; /* poți ajusta în funcție de nevoie */
+  overflow-y: auto;
+  border: 2px solid red; /* highlight roșu */
+  padding: 5px;
+">
+  <div id="blinkiesContainer"></div>
+</div>
 `;
 
 document.getElementById("socialsSection").insertAdjacentElement("afterend", section);
@@ -76,14 +83,9 @@ function createBlinkie(src) {
   const img = document.createElement("img");
   img.src = src;
 
-  // detectăm dacă e wide DUPĂ ce se încarcă
   img.onload = () => {
     const aspect = img.naturalWidth / img.naturalHeight;
-
-    // dacă e wide → ocupă tot rândul
-    if (aspect > 1.4) {
-      el.classList.add("wide");
-    }
+    if (aspect > 1.4) el.classList.add("wide");
   };
 
   img.onerror = () => el.remove();
@@ -108,27 +110,33 @@ function addBlinkieIfExists(src) {
 // =======================
 // 🔥 POPULARE
 // =======================
-
-// Folder 1 → 1–250
-for (let i = 1; i <= 250; i++) {
-  addBlinkieIfExists(`1 (${i}).gif`);
-}
-
-// Folder 2 → 1–200
-for (let i = 1; i <= 200; i++) {
-  addBlinkieIfExists(`2 (${i}).gif`);
-}
+for (let i = 1; i <= 250; i++) addBlinkieIfExists(`1 (${i}).gif`);
+for (let i = 1; i <= 200; i++) addBlinkieIfExists(`2 (${i}).gif`);
 
 // =======================
-// 🔥 FLASH TEXT (FIX)
+// 🔥 FLASH TEXT RANDOM COLOR
 // =======================
-const title = section.querySelector("h2");
+const title = document.getElementById("blinkiesTitle");
 const text = title.textContent;
 title.textContent = "";
 
+function randomColor() {
+  const r = Math.floor(Math.random() * 256);
+  const g = Math.floor(Math.random() * 256);
+  const b = Math.floor(Math.random() * 256);
+  return `rgb(${r},${g},${b})`;
+}
+
+const spans = [];
 for (let char of text) {
   const span = document.createElement("span");
   span.textContent = char;
-  span.style.color = "#ff00ff";
+  span.style.transition = "color 0.3s";
   title.appendChild(span);
+  spans.push(span);
 }
+
+// schimbăm culorile random la fiecare 300ms
+setInterval(() => {
+  spans.forEach(span => span.style.color = randomColor());
+}, 300);
