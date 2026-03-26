@@ -1,5 +1,5 @@
 // =======================
-// 🔥 CREATE SECTION
+// 🔥 CREATE BLINKIES SECTION
 // =======================
 const section = document.createElement("section");
 
@@ -52,7 +52,7 @@ function createBlinkie(src) {
 }
 
 // =======================
-// 🔥 GENERATE GIFS 1-300 FOR BOTH TYPES
+// 🔥 GENERATE 1-300 FOR BOTH TYPES
 // =======================
 const blinkies = [];
 let current = 1;
@@ -61,7 +61,6 @@ const total = 300;
 function addNextBlinkie() {
   if (current > total) return;
 
-  // Generează GIF-ul de tip 1 și 2
   ["1", "2"].forEach(prefix => {
     const name = `${prefix} (${current}).gif`;
     const el = createBlinkie(name);
