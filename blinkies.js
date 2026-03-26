@@ -10,7 +10,7 @@ section.innerHTML = `
 
 <div id="blinkiesContainer" style="
   display:grid;
-  grid-template-columns: repeat(10, 100px); /* 10 coloane fixe */
+  grid-template-columns: repeat(10, 100px);
   gap:2px;
   justify-content:center;
   margin-top:10px;
@@ -24,37 +24,55 @@ const container = document.getElementById("blinkiesContainer");
 // =======================
 // 🔥 CREATE BLINKIE ELEMENT
 // =======================
-function createBlinkie(src) {
+function createBlinkie(src, wide=false) {
   const el = document.createElement("div");
-  el.style.width = "100px";
+  el.style.width = wide ? "210px" : "100px"; // dacă e GIF lat, fă container mai mare
   el.style.height = "100px";
   el.style.overflow = "hidden";
 
   const img = document.createElement("img");
-  img.src = src; // direct, fără lazy loading
+  img.src = src;
   img.style.width = "100%";
   img.style.height = "100%";
   img.style.objectFit = "contain";
-  img.onerror = () => el.remove(); // dacă GIF-ul nu există
 
   el.appendChild(img);
   return el;
 }
 
 // =======================
-// 🔥 ADD BLINKIES TO DOM (FIX ORDER)
+// 🔥 ADD BLINKIES TO DOM (DOAR EXISTENTE)
+// =======================
+function addBlinkieIfExists(src, wide=false) {
+  const testImg = new Image();
+  testImg.src = src;
+
+  testImg.onload = () => {
+    const el = createBlinkie(src, wide);
+    container.appendChild(el);
+  };
+  testImg.onerror = () => {}; // nu facem nimic dacă nu există
+}
+
+// =======================
+// 🔥 POPULARE CONTAINERE
 // =======================
 
+let totalAdded = 0;
+
 // Folder 1 → 1–250
-for (let i = 1; i <= 250; i++) {
-  const el = createBlinkie(`1 (${i}).gif`);
-  container.appendChild(el);
+for (let i = 1; i <= 250 && totalAdded < 450; i++) {
+  // Pentru unele GIF-uri “paratoase” le facem wide la întâmplare
+  const isWide = Math.random() < 0.15; // 15% șansă să fie wide
+  addBlinkieIfExists(`1 (${i}).gif`, isWide);
+  totalAdded++;
 }
 
 // Folder 2 → 1–200
-for (let i = 1; i <= 200; i++) {
-  const el = createBlinkie(`2 (${i}).gif`);
-  container.appendChild(el);
+for (let i = 1; i <= 200 && totalAdded < 450; i++) {
+  const isWide = Math.random() < 0.15;
+  addBlinkieIfExists(`2 (${i}).gif`, isWide);
+  totalAdded++;
 }
 
 // =======================
@@ -72,32 +90,28 @@ for (let char of text) {
 }
 
 // =======================
-// 🔥 SLOW AUTO SCROLL
-// =======================
-function startSlowScroll() {
-  let scrollY = 0;
-  const speed = 0.2; // px per frame
-  function scrollStep() {
-    scrollY += speed;
-    window.scrollTo(0, scrollY);
-    if (scrollY < document.body.scrollHeight - window.innerHeight) {
-      requestAnimationFrame(scrollStep);
-    }
-  }
-  requestAnimationFrame(scrollStep);
-}
-startSlowScroll();
-
-// =======================
 // 🔥 MEDIA QUERY MOBILE
 // =======================
 const style = document.createElement("style");
 style.textContent = `
+/* Grid mobil: max 3 blinkies pe rând */
 @media (max-width: 600px) {
   #blinkiesContainer {
-    grid-template-columns: repeat(5, 80px);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1px;
   }
 }
+
+/* Scroll foarte sensibil / lin */
+body {
+  overscroll-behavior: contain; /* previne scroll “haotic” */
+  scroll-behavior: smooth;
+}
 `;
 document.head.appendChild(style);
+
+// =======================
+// 🔥 SCROLL NORMAL, FOARTE LENT
+// =======================
+// Dacă vrei, utilizatorul poate să dea scroll manual, fără auto scroll
+// Scroll-ul este lin datorită scroll-behavior: smooth
