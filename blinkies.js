@@ -184,22 +184,8 @@ for (let i=1;i<=300;i++) addBlinkieIfExists(`1 (${i}).gif`);
 for (let i=1;i<=300;i++) addBlinkieIfExists(`2 (${i}).gif`);
 for (let i=1;i<=300;i++) addBlinkieIfExists(`3 (${i}).gif`);
 for (let i=1;i<=300;i++) addBlinkieIfExists(`4 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`5 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`6 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`7 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`8 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`9 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`10 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`11 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`12 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`13 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`14 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`15 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`16 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`17 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`18 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`19 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`20 (${i}).gif`);
+
+
 
 // =======================
 // 🩸 STAINS (vizibili + fade-out 1.3s)
