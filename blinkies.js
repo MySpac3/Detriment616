@@ -8,7 +8,7 @@ section.innerHTML = `
   Blinkies
 </h2>
 
-<div id="scrollText" style="text-align:center; font-size:12px; opacity:0.7; margin-bottom:8px;">
+<div id="scrollText" style="text-align:center; font-size:12px; opacity:0.7; margin-bottom:8px; color:#fff;">
   (scroll inside the red box for blinkies)
 </div>
 
@@ -122,9 +122,9 @@ html, body {
   position: absolute;
   opacity: 0;
   pointer-events: none;
-  z-index: 2; /* 🔥 peste blinkies dar sub sânge edges */
+  z-index: 2; /* peste blinkies dar sub edges */
   filter: contrast(1.2) saturate(1.2);
-  animation: stainFade 4s ease-out forwards;
+  animation: none;
 }
 
 @keyframes stainFade {
@@ -178,53 +178,35 @@ function addBlinkieIfExists(src) {
 }
 
 // =======================
-// 🔥 20 FOR-URI
+// 🔥 4 FOR-URI (example)
 // =======================
 for (let i=1;i<=300;i++) addBlinkieIfExists(`1 (${i}).gif`);
 for (let i=1;i<=300;i++) addBlinkieIfExists(`2 (${i}).gif`);
 for (let i=1;i<=300;i++) addBlinkieIfExists(`3 (${i}).gif`);
 for (let i=1;i<=300;i++) addBlinkieIfExists(`4 (${i}).gif`);
 
-
-
 // =======================
-// 🩸 STAINS (vizibili + fade-out 1.3s)
+// 🩸 CLICK / TAP BLOOD STAIN (fade 2s)
 // =======================
 const stains = ["strop.jpg", "stropp.jpg", "stroppp.jpg"];
 
-setInterval(() => {
-  if (Math.random() > 0.65) {
-    const s = document.createElement("img");
-    s.src = stains[Math.floor(Math.random() * stains.length)];
-    s.className = "bloodStain";
+function createClickStain(x, y) {
+  const s = document.createElement("img");
+  s.src = stains[Math.floor(Math.random() * stains.length)];
+  s.className = "bloodStain";
+  s.style.left = x - wrapper.getBoundingClientRect().left + "px";
+  s.style.top = y - wrapper.getBoundingClientRect().top + "px";
+  s.style.width = (60 + Math.random() * 80) + "px"; // dimensiune random
+  s.style.opacity = 1;
+  s.style.transition = "opacity 2s ease-in-out";
+  wrapper.appendChild(s);
 
-    // poziție random pe wrapper
-    s.style.left = Math.random() * 80 + "%";
-    s.style.top = Math.random() * 80 + "%";
-
-    // dimensiune random, de două ori mai mare
-    s.style.width = (60 + Math.random() * 80) + "px"; // 30-70 px -> 60-140 px
-
-    // fade-out vizibil
-    s.style.opacity = 1;
-    s.style.transition = "opacity 1.3s ease-in-out";
-
-    wrapper.appendChild(s);
-
-    // start fade-out
-    setTimeout(() => {
-      s.style.opacity = 0;
-    }, 50); // mic delay ca să se aplice tranziția
-
-    // elimină din DOM după 1,3 secunde
-    setTimeout(() => s.remove(), 1300);
-  }
-}, 2000);
+  setTimeout(() => s.style.opacity = 0, 50); // fade out
+  setTimeout(() => s.remove(), 2000); // eliminare după 2s
+}
 
 // CLICK DESKTOP
-wrapper.addEventListener("click", (e) => {
-  createClickStain(e.clientX, e.clientY);
-});
+wrapper.addEventListener("click", (e) => createClickStain(e.clientX, e.clientY));
 
 // TAP MOBILE
 wrapper.addEventListener("touchstart", (e) => {
@@ -235,22 +217,22 @@ wrapper.addEventListener("touchstart", (e) => {
 // =======================
 // 🌈 FLASH TEXT
 // =======================
-function flash(el){
-  const t=el.textContent;
-  el.textContent="";
-  const spans=[];
-  for(let c of t){
-    const s=document.createElement("span");
-    s.textContent=c;
+function flash(el) {
+  const t = el.textContent;
+  el.textContent = "";
+  const spans = [];
+  for (let c of t) {
+    const s = document.createElement("span");
+    s.textContent = c;
     el.appendChild(s);
     spans.push(s);
   }
-  setInterval(()=>{
-    spans.forEach(s=>{
-      s.style.color=`rgb(${Math.random()*255},${Math.random()*255},${Math.random()*255})`;
+  setInterval(() => {
+    spans.forEach(s => {
+      s.style.color = `rgb(${Math.random()*255},${Math.random()*255},${Math.random()*255})`;
     });
-  },300);
+  }, 300);
 }
 
 flash(document.getElementById("blinkiesTitle"));
-flash(document.getElementById("scrollText"));  
+flash(document.getElementById("scrollText"));
