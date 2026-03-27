@@ -122,7 +122,7 @@ html, body {
 .bloodStain {
   position: absolute;
   pointer-events: none;
-  z-index: 9999; /* peste tot */
+  z-index: 9999;
   filter: contrast(1.2) saturate(1.2);
   opacity: 0;
   transition: opacity 2s ease-in-out;
@@ -179,15 +179,16 @@ for (let i = 1; i <= 300; i++) addBlinkieIfExists(`3 (${i}).gif`);
 for (let i = 1; i <= 300; i++) addBlinkieIfExists(`4 (${i}).gif`);
 
 // =======================
-// 🩸 BLOOD STAIN FULL PAGE
+// 🩸 BLOOD STAIN FULL PAGE (exact sub deget / mouse)
 // =======================
 const stains = ["strop.jpg", "stropp.jpg", "stroppp.jpg"];
 
-function createFullPageStain(x, y) {
+function createExactStain(x, y) {
   const s = document.createElement("img");
   s.src = stains[Math.floor(Math.random() * stains.length)];
   s.className = "bloodStain";
 
+  // exact la coordonatele mouse/tap
   s.style.left = x + "px";
   s.style.top = y + "px";
   s.style.width = (60 + Math.random() * 80) + "px";
@@ -195,17 +196,19 @@ function createFullPageStain(x, y) {
 
   document.body.appendChild(s);
 
-  setTimeout(() => s.style.opacity = 0, 50); // fade out
-  setTimeout(() => s.remove(), 2000); // eliminare după 2s
+  setTimeout(() => s.style.opacity = 0, 50);
+  setTimeout(() => s.remove(), 2000);
 }
 
 // CLICK DESKTOP
-document.addEventListener("click", (e) => createFullPageStain(e.clientX, e.clientY));
+document.addEventListener("click", (e) => {
+  createExactStain(e.clientX, e.clientY);
+});
 
 // TAP MOBILE
 document.addEventListener("touchstart", (e) => {
   const touch = e.touches[0];
-  createFullPageStain(touch.clientX, touch.clientY);
+  createExactStain(touch.clientX, touch.clientY);
 });
 
 // =======================
@@ -218,7 +221,7 @@ function flash(el, fixedColor=false) {
   for (let c of t) {
     const s = document.createElement("span");
     s.textContent = c;
-    if (fixedColor) s.style.color = "#fff"; // text alb fix
+    if (fixedColor) s.style.color = "#fff"; // alb fix
     el.appendChild(s);
     spans.push(s);
   }
@@ -232,4 +235,4 @@ function flash(el, fixedColor=false) {
 }
 
 flash(document.getElementById("blinkiesTitle"));
-flash(document.getElementById("scrollText"), true); // alb fix
+flash(document.getElementById("scrollText"), true);
