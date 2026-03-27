@@ -28,6 +28,7 @@ style.textContent = `
 html, body {
   overflow-x: hidden;
   overscroll-behavior: none;
+  position: relative;
 }
 
 #mainContent {
@@ -120,29 +121,22 @@ html, body {
 
 .bloodStain {
   position: absolute;
-  opacity: 0;
   pointer-events: none;
-  z-index: 2; /* peste blinkies dar sub edges */
+  z-index: 9999; /* peste tot */
   filter: contrast(1.2) saturate(1.2);
-  animation: none;
-}
-
-@keyframes stainFade {
-  0% { opacity: 0; }
-  20% { opacity: 0.25; }
-  100% { opacity: 0; }
+  opacity: 0;
+  transition: opacity 2s ease-in-out;
 }
 `;
 document.head.appendChild(style);
 
 // =======================
-// 🩸 SIDE BLOOD
+// 🩸 SIDE BLOOD (container roșu)
 // =======================
 const wrapper = document.getElementById("blinkiesContainerWrapper");
 
 const left = document.createElement("div");
 left.className = "bloodLeft";
-
 const right = document.createElement("div");
 right.className = "bloodRight";
 
@@ -166,7 +160,6 @@ function createBlinkie(src) {
   };
 
   img.onerror = () => el.remove();
-
   el.appendChild(img);
   return el;
 }
@@ -180,45 +173,39 @@ function addBlinkieIfExists(src) {
 // =======================
 // 🔥 4 FOR-URI (example)
 // =======================
-for (let i=1;i<=300;i++) addBlinkieIfExists(`1 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`2 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`3 (${i}).gif`);
-for (let i=1;i<=300;i++) addBlinkieIfExists(`4 (${i}).gif`);
+for (let i = 1; i <= 300; i++) addBlinkieIfExists(`1 (${i}).gif`);
+for (let i = 1; i <= 300; i++) addBlinkieIfExists(`2 (${i}).gif`);
+for (let i = 1; i <= 300; i++) addBlinkieIfExists(`3 (${i}).gif`);
+for (let i = 1; i <= 300; i++) addBlinkieIfExists(`4 (${i}).gif`);
 
 // =======================
-// 🩸 CLICK / TAP BLOOD STAIN (fade 2s exact locul click/tap)
+// 🩸 BLOOD STAIN FULL PAGE
 // =======================
 const stains = ["strop.jpg", "stropp.jpg", "stroppp.jpg"];
 
-function createClickStain(x, y) {
+function createFullPageStain(x, y) {
   const s = document.createElement("img");
   s.src = stains[Math.floor(Math.random() * stains.length)];
   s.className = "bloodStain";
 
-  // poziție exactă
-  const rect = wrapper.getBoundingClientRect();
-  s.style.left = x - rect.left + "px";
-  s.style.top = y - rect.top + "px";
-
-  // dimensiune random
+  s.style.left = x + "px";
+  s.style.top = y + "px";
   s.style.width = (60 + Math.random() * 80) + "px";
-
   s.style.opacity = 1;
-  s.style.transition = "opacity 2s ease-in-out";
 
-  wrapper.appendChild(s);
+  document.body.appendChild(s);
 
   setTimeout(() => s.style.opacity = 0, 50); // fade out
-  setTimeout(() => s.remove(), 2000); // eliminare după 2 sec
+  setTimeout(() => s.remove(), 2000); // eliminare după 2s
 }
 
 // CLICK DESKTOP
-wrapper.addEventListener("click", (e) => createClickStain(e.clientX, e.clientY));
+document.addEventListener("click", (e) => createFullPageStain(e.clientX, e.clientY));
 
 // TAP MOBILE
-wrapper.addEventListener("touchstart", (e) => {
+document.addEventListener("touchstart", (e) => {
   const touch = e.touches[0];
-  createClickStain(touch.clientX, touch.clientY);
+  createFullPageStain(touch.clientX, touch.clientY);
 });
 
 // =======================
