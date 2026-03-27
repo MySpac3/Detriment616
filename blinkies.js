@@ -31,6 +31,10 @@ html, body {
   position: relative;
 }
 
+#mainContent {
+  overscroll-behavior: none;
+}
+
 #blinkiesContainerWrapper {
   position: relative;
   max-height: 400px;
@@ -173,31 +177,22 @@ for (let i = 1; i <= 300; i++) addBlinkieIfExists(`3 (${i}).gif`);
 for (let i = 1; i <= 300; i++) addBlinkieIfExists(`4 (${i}).gif`);
 
 // =======================
-// 🩸 BLOOD STAIN EXACT CU SCROLL
+// 🩸 BLOOD STAIN FULL PAGE + IN CONTAINER
 // =======================
-function createStain(x, y, parent=document.body) {
+const stains = ["strop.jpg", "stropp.jpg", "stroppp.jpg"];
+
+function createStain(x, y) {
   const s = document.createElement("img");
   s.src = stains[Math.floor(Math.random() * stains.length)];
   s.className = "bloodStain";
 
-  let left, top;
-
-  if (parent !== document.body) {
-    // coordonate relative la container + scroll
-    const rect = parent.getBoundingClientRect();
-    left = x - rect.left + parent.scrollLeft;
-    top  = y - rect.top + parent.scrollTop;
-    parent.appendChild(s);
-  } else {
-    left = x;
-    top  = y;
-    document.body.appendChild(s);
-  }
-
-  s.style.left = left + "px";
-  s.style.top  = top + "px";
+  // exact coordonate viewport
+  s.style.left = x + "px";
+  s.style.top = y + "px";
   s.style.width = (60 + Math.random() * 80) + "px";
   s.style.opacity = 1;
+
+  document.body.appendChild(s); // peste tot
 
   setTimeout(() => s.style.opacity = 0, 50);
   setTimeout(() => s.remove(), 2000);
@@ -205,21 +200,13 @@ function createStain(x, y, parent=document.body) {
 
 // CLICK DESKTOP
 document.addEventListener("click", (e) => {
-  if (wrapper.contains(e.target)) {
-    createStain(e.clientX, e.clientY, wrapper);
-  } else {
-    createStain(e.clientX, e.clientY);
-  }
+  createStain(e.clientX, e.clientY);
 });
 
 // TAP MOBILE
 document.addEventListener("touchstart", (e) => {
   const touch = e.touches[0];
-  if (wrapper.contains(touch.target)) {
-    createStain(touch.clientX, touch.clientY, wrapper);
-  } else {
-    createStain(touch.clientX, touch.clientY);
-  }
+  createStain(touch.clientX, touch.clientY);
 });
 
 // =======================
@@ -246,4 +233,4 @@ function flash(el, fixedColor=false) {
 }
 
 flash(document.getElementById("blinkiesTitle"));
-flash(document.getElementById("scrollText"), true);  adauga  si daca dau scroll in container sa apara acolo unde am dat scroll, nu doar sus 
+flash(document.getElementById("scrollText"), true);
