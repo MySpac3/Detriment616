@@ -173,27 +173,29 @@ for (let i = 1; i <= 300; i++) addBlinkieIfExists(`3 (${i}).gif`);
 for (let i = 1; i <= 300; i++) addBlinkieIfExists(`4 (${i}).gif`);
 
 // =======================
-// 🩸 BLOOD STAIN EXACT
+// 🩸 BLOOD STAIN EXACT CU SCROLL
 // =======================
-const stains = ["strop.jpg", "stropp.jpg", "stroppp.jpg"];
-
 function createStain(x, y, parent=document.body) {
   const s = document.createElement("img");
   s.src = stains[Math.floor(Math.random() * stains.length)];
   s.className = "bloodStain";
 
-  // dacă e în container, coordonatele relative la container
+  let left, top;
+
   if (parent !== document.body) {
+    // coordonate relative la container + scroll
     const rect = parent.getBoundingClientRect();
-    s.style.left = (x - rect.left) + "px";
-    s.style.top = (y - rect.top) + "px";
+    left = x - rect.left + parent.scrollLeft;
+    top  = y - rect.top + parent.scrollTop;
     parent.appendChild(s);
   } else {
-    s.style.left = x + "px";
-    s.style.top = y + "px";
+    left = x;
+    top  = y;
     document.body.appendChild(s);
   }
 
+  s.style.left = left + "px";
+  s.style.top  = top + "px";
   s.style.width = (60 + Math.random() * 80) + "px";
   s.style.opacity = 1;
 
@@ -244,4 +246,4 @@ function flash(el, fixedColor=false) {
 }
 
 flash(document.getElementById("blinkiesTitle"));
-flash(document.getElementById("scrollText"), true);
+flash(document.getElementById("scrollText"), true);  adauga  si daca dau scroll in container sa apara acolo unde am dat scroll, nu doar sus 
