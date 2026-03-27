@@ -8,7 +8,7 @@ section.innerHTML = `
   Blinkies
 </h2>
 
-<div style="text-align:center; font-size:12px; opacity:0.7; margin-bottom:8px;">
+<div id="scrollText" style="text-align:center; font-size:12px; opacity:0.7; margin-bottom:8px;">
   (scroll inside the red box for blinkies)
 </div>
 
@@ -21,12 +21,10 @@ document.getElementById("socialsSection").insertAdjacentElement("afterend", sect
 const container = document.getElementById("blinkiesContainer");
 
 // =======================
-// 🔥 STYLE EXTREME
+// 🔥 STYLE
 // =======================
 const style = document.createElement("style");
 style.textContent = `
-
-/* ❌ REMOVE BOUNCE COMPLET */
 html, body {
   overflow-x: hidden;
   overscroll-behavior: none;
@@ -36,107 +34,72 @@ html, body {
   overscroll-behavior: none;
 }
 
-/* WRAPPER */
 #blinkiesContainerWrapper {
   position: relative;
   max-height: 400px;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 10px;
   border: 2px solid #ff0000;
   background: rgba(0,0,0,0.6);
+  touch-action: pan-y;
 }
 
-/* =======================
-   🩸 BLOOD EDGES COMPLEX
-======================= */
-
-/* TOP */
 #blinkiesContainerWrapper::before {
   content: "";
   position: absolute;
   top: -2px;
-  left: 0;
   width: 100%;
   height: 30px;
-  pointer-events: none;
   z-index: 3;
   background:
     radial-gradient(circle at 10% 0, #ff0000 6px, transparent 7px),
-    radial-gradient(circle at 30% 0, #ff0000 5px, transparent 6px),
     radial-gradient(circle at 50% 0, #ff0000 7px, transparent 8px),
-    radial-gradient(circle at 70% 0, #ff0000 5px, transparent 6px),
     radial-gradient(circle at 90% 0, #ff0000 6px, transparent 7px);
-  animation: dripTop 2.2s infinite linear;
+  animation: dripTop 2s infinite linear;
 }
 
-/* BOTTOM */
 #blinkiesContainerWrapper::after {
   content: "";
   position: absolute;
   bottom: -2px;
-  left: 0;
   width: 100%;
   height: 25px;
-  pointer-events: none;
   z-index: 3;
   background:
-    radial-gradient(circle at 20% 100%, #ff0000 5px, transparent 6px),
-    radial-gradient(circle at 60% 100%, #ff0000 6px, transparent 7px),
-    radial-gradient(circle at 85% 100%, #ff0000 4px, transparent 5px);
+    radial-gradient(circle at 30% 100%, #ff0000 5px, transparent 6px),
+    radial-gradient(circle at 70% 100%, #ff0000 6px, transparent 7px);
   animation: dripBottom 2.5s infinite linear;
 }
 
-/* LEFT SIDE */
-#blinkiesContainerWrapper .bloodLeft {
+.bloodLeft, .bloodRight {
   position: absolute;
   top: 0;
-  left: -2px;
   width: 8px;
   height: 100%;
-  background: linear-gradient(to bottom, #ff0000, transparent);
-  animation: dripSide 3s infinite linear;
   z-index: 3;
-  pointer-events: none;
+  background: linear-gradient(to bottom, #ff0000, transparent);
 }
 
-/* RIGHT SIDE */
-#blinkiesContainerWrapper .bloodRight {
-  position: absolute;
-  top: 0;
-  right: -2px;
-  width: 8px;
-  height: 100%;
-  background: linear-gradient(to bottom, #ff0000, transparent);
-  animation: dripSide 4s infinite linear;
-  z-index: 3;
-  pointer-events: none;
-}
+.bloodLeft { left: -2px; animation: dripSide 3s infinite linear; }
+.bloodRight { right: -2px; animation: dripSide 4s infinite linear; }
 
-/* ANIMATIONS */
 @keyframes dripTop {
-  0% { transform: translateY(0); opacity: 1; }
   100% { transform: translateY(20px); opacity: 0; }
 }
-
 @keyframes dripBottom {
-  0% { transform: translateY(0); opacity: 1; }
   100% { transform: translateY(-15px); opacity: 0; }
 }
-
 @keyframes dripSide {
-  0% { background-position: 0 0; }
   100% { background-position: 0 60px; }
 }
 
-/* GRID */
 #blinkiesContainer {
   display: grid;
   grid-template-columns: repeat(3, 100px);
   justify-content: center;
   gap: 4px;
   margin: 10px 0 20px;
-  position: relative;
-  z-index: 1;
 }
 
 .blinkie {
@@ -155,32 +118,28 @@ html, body {
   object-fit: contain;
 }
 
-/* =======================
-   🩸 BLOOD STAINS (FADE)
-======================= */
-
 .bloodStain {
   position: absolute;
-  width: 60px;
-  height: 60px;
   opacity: 0;
   pointer-events: none;
-  z-index: 0;
-  filter: blur(0.5px);
-  animation: stainFade 6s ease-in-out forwards;
+  z-index: 2; /* 🔥 peste blinkies dar sub sânge edges */
+  filter: contrast(1.2) saturate(1.2);
+  animation: stainFade 4s ease-out forwards;
 }
 
 @keyframes stainFade {
-  0% { opacity: 0; transform: scale(0.7); }
+  0% { opacity: 0; }
   20% { opacity: 0.25; }
-  80% { opacity: 0.2; }
-  100% { opacity: 0; transform: scale(1.1); }
+  100% { opacity: 0; }
 }
 `;
 document.head.appendChild(style);
 
-// add side blood elements
+// =======================
+// 🩸 SIDE BLOOD
+// =======================
 const wrapper = document.getElementById("blinkiesContainerWrapper");
+
 const left = document.createElement("div");
 left.className = "bloodLeft";
 
@@ -191,7 +150,7 @@ wrapper.appendChild(left);
 wrapper.appendChild(right);
 
 // =======================
-// 🔥 BLINKIES
+// 🔥 BLINKIE FUNC
 // =======================
 function createBlinkie(src) {
   const el = document.createElement("div");
@@ -201,8 +160,9 @@ function createBlinkie(src) {
   img.src = src;
 
   img.onload = () => {
-    const aspect = img.naturalWidth / img.naturalHeight;
-    if (aspect > 1.4) el.classList.add("wide");
+    if (img.naturalWidth / img.naturalHeight > 1.4) {
+      el.classList.add("wide");
+    }
   };
 
   img.onerror = () => el.remove();
@@ -214,60 +174,97 @@ function createBlinkie(src) {
 function addBlinkieIfExists(src) {
   const test = new Image();
   test.src = src;
-
-  test.onload = () => {
-    const el = createBlinkie(src);
-    container.appendChild(el);
-  };
+  test.onload = () => container.appendChild(createBlinkie(src));
 }
 
-// populate
-for (let i = 1; i <= 250; i++) addBlinkieIfExists(`1 (${i}).gif`);
-for (let i = 1; i <= 200; i++) addBlinkieIfExists(`2 (${i}).gif`);
+// =======================
+// 🔥 20 FOR-URI
+// =======================
+for (let i=1;i<=300;i++) addBlinkieIfExists(`1 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`2 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`3 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`4 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`5 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`6 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`7 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`8 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`9 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`10 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`11 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`12 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`13 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`14 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`15 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`16 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`17 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`18 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`19 (${i}).gif`);
+for (let i=1;i<=300;i++) addBlinkieIfExists(`20 (${i}).gif`);
 
 // =======================
-// 🩸 RANDOM BLOOD STAINS
+// 🩸 STAINS (vizibili + fade-out 1.3s)
 // =======================
 const stains = ["strop.jpg", "stropp.jpg", "stroppp.jpg"];
 
-function spawnStain() {
-  const stain = document.createElement("img");
-  stain.src = stains[Math.floor(Math.random() * stains.length)];
-  stain.className = "bloodStain";
-
-  stain.style.left = Math.random() * 80 + "%";
-  stain.style.top = Math.random() * 80 + "%";
-  stain.style.width = (40 + Math.random() * 40) + "px";
-
-  wrapper.appendChild(stain);
-
-  setTimeout(() => stain.remove(), 6000);
-}
-
-// spawn rar (nu constant)
 setInterval(() => {
-  if (Math.random() > 0.6) spawnStain();
+  if (Math.random() > 0.65) {
+    const s = document.createElement("img");
+    s.src = stains[Math.floor(Math.random() * stains.length)];
+    s.className = "bloodStain";
+
+    // poziție random pe wrapper
+    s.style.left = Math.random() * 80 + "%";
+    s.style.top = Math.random() * 80 + "%";
+
+    // dimensiune random, de două ori mai mare
+    s.style.width = (60 + Math.random() * 80) + "px"; // 30-70 px -> 60-140 px
+
+    // fade-out vizibil
+    s.style.opacity = 1;
+    s.style.transition = "opacity 1.3s ease-in-out";
+
+    wrapper.appendChild(s);
+
+    // start fade-out
+    setTimeout(() => {
+      s.style.opacity = 0;
+    }, 50); // mic delay ca să se aplice tranziția
+
+    // elimină din DOM după 1,3 secunde
+    setTimeout(() => s.remove(), 1300);
+  }
 }, 2000);
+
+// CLICK DESKTOP
+wrapper.addEventListener("click", (e) => {
+  createClickStain(e.clientX, e.clientY);
+});
+
+// TAP MOBILE
+wrapper.addEventListener("touchstart", (e) => {
+  const touch = e.touches[0];
+  createClickStain(touch.clientX, touch.clientY);
+});
 
 // =======================
 // 🌈 FLASH TEXT
 // =======================
-const title = document.getElementById("blinkiesTitle");
-const text = title.textContent;
-title.textContent = "";
-
-function randomColor() {
-  return `rgb(${Math.random()*255},${Math.random()*255},${Math.random()*255})`;
+function flash(el){
+  const t=el.textContent;
+  el.textContent="";
+  const spans=[];
+  for(let c of t){
+    const s=document.createElement("span");
+    s.textContent=c;
+    el.appendChild(s);
+    spans.push(s);
+  }
+  setInterval(()=>{
+    spans.forEach(s=>{
+      s.style.color=`rgb(${Math.random()*255},${Math.random()*255},${Math.random()*255})`;
+    });
+  },300);
 }
 
-const spans = [];
-for (let char of text) {
-  const span = document.createElement("span");
-  span.textContent = char;
-  title.appendChild(span);
-  spans.push(span);
-}
-
-setInterval(() => {
-  spans.forEach(s => s.style.color = randomColor());
-}, 300);
+flash(document.getElementById("blinkiesTitle"));
+flash(document.getElementById("scrollText"));  
