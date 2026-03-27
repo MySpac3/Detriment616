@@ -31,10 +31,6 @@ html, body {
   position: relative;
 }
 
-#mainContent {
-  overscroll-behavior: none;
-}
-
 #blinkiesContainerWrapper {
   position: relative;
   max-height: 400px;
@@ -177,22 +173,29 @@ for (let i = 1; i <= 300; i++) addBlinkieIfExists(`3 (${i}).gif`);
 for (let i = 1; i <= 300; i++) addBlinkieIfExists(`4 (${i}).gif`);
 
 // =======================
-// 🩸 BLOOD STAIN FULL PAGE + IN CONTAINER
+// 🩸 BLOOD STAIN EXACT
 // =======================
 const stains = ["strop.jpg", "stropp.jpg", "stroppp.jpg"];
 
-function createStain(x, y) {
+function createStain(x, y, parent=document.body) {
   const s = document.createElement("img");
   s.src = stains[Math.floor(Math.random() * stains.length)];
   s.className = "bloodStain";
 
-  // exact coordonate viewport
-  s.style.left = x + "px";
-  s.style.top = y + "px";
+  // dacă e în container, coordonatele relative la container
+  if (parent !== document.body) {
+    const rect = parent.getBoundingClientRect();
+    s.style.left = (x - rect.left) + "px";
+    s.style.top = (y - rect.top) + "px";
+    parent.appendChild(s);
+  } else {
+    s.style.left = x + "px";
+    s.style.top = y + "px";
+    document.body.appendChild(s);
+  }
+
   s.style.width = (60 + Math.random() * 80) + "px";
   s.style.opacity = 1;
-
-  document.body.appendChild(s); // peste tot
 
   setTimeout(() => s.style.opacity = 0, 50);
   setTimeout(() => s.remove(), 2000);
@@ -200,13 +203,21 @@ function createStain(x, y) {
 
 // CLICK DESKTOP
 document.addEventListener("click", (e) => {
-  createStain(e.clientX, e.clientY);
+  if (wrapper.contains(e.target)) {
+    createStain(e.clientX, e.clientY, wrapper);
+  } else {
+    createStain(e.clientX, e.clientY);
+  }
 });
 
 // TAP MOBILE
 document.addEventListener("touchstart", (e) => {
   const touch = e.touches[0];
-  createStain(touch.clientX, touch.clientY);
+  if (wrapper.contains(touch.target)) {
+    createStain(touch.clientX, touch.clientY, wrapper);
+  } else {
+    createStain(touch.clientX, touch.clientY);
+  }
 });
 
 // =======================
