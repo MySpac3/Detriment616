@@ -186,7 +186,7 @@ for (let i=1;i<=300;i++) addBlinkieIfExists(`3 (${i}).gif`);
 for (let i=1;i<=300;i++) addBlinkieIfExists(`4 (${i}).gif`);
 
 // =======================
-// 🩸 CLICK / TAP BLOOD STAIN (fade 2s)
+// 🩸 CLICK / TAP BLOOD STAIN (fade 2s exact locul click/tap)
 // =======================
 const stains = ["strop.jpg", "stropp.jpg", "stroppp.jpg"];
 
@@ -194,15 +194,22 @@ function createClickStain(x, y) {
   const s = document.createElement("img");
   s.src = stains[Math.floor(Math.random() * stains.length)];
   s.className = "bloodStain";
-  s.style.left = x - wrapper.getBoundingClientRect().left + "px";
-  s.style.top = y - wrapper.getBoundingClientRect().top + "px";
-  s.style.width = (60 + Math.random() * 80) + "px"; // dimensiune random
+
+  // poziție exactă
+  const rect = wrapper.getBoundingClientRect();
+  s.style.left = x - rect.left + "px";
+  s.style.top = y - rect.top + "px";
+
+  // dimensiune random
+  s.style.width = (60 + Math.random() * 80) + "px";
+
   s.style.opacity = 1;
   s.style.transition = "opacity 2s ease-in-out";
+
   wrapper.appendChild(s);
 
   setTimeout(() => s.style.opacity = 0, 50); // fade out
-  setTimeout(() => s.remove(), 2000); // eliminare după 2s
+  setTimeout(() => s.remove(), 2000); // eliminare după 2 sec
 }
 
 // CLICK DESKTOP
@@ -217,22 +224,25 @@ wrapper.addEventListener("touchstart", (e) => {
 // =======================
 // 🌈 FLASH TEXT
 // =======================
-function flash(el) {
+function flash(el, fixedColor=false) {
   const t = el.textContent;
   el.textContent = "";
   const spans = [];
   for (let c of t) {
     const s = document.createElement("span");
     s.textContent = c;
+    if (fixedColor) s.style.color = "#fff"; // text alb fix
     el.appendChild(s);
     spans.push(s);
   }
-  setInterval(() => {
-    spans.forEach(s => {
-      s.style.color = `rgb(${Math.random()*255},${Math.random()*255},${Math.random()*255})`;
-    });
-  }, 300);
+  if (!fixedColor) {
+    setInterval(() => {
+      spans.forEach(s => {
+        s.style.color = `rgb(${Math.random()*255},${Math.random()*255},${Math.random()*255})`;
+      });
+    }, 300);
+  }
 }
 
 flash(document.getElementById("blinkiesTitle"));
-flash(document.getElementById("scrollText"));
+flash(document.getElementById("scrollText"), true); // alb fix
