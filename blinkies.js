@@ -134,12 +134,10 @@ document.head.appendChild(style);
 // 🩸 SIDE BLOOD (container roșu)
 // =======================
 const wrapper = document.getElementById("blinkiesContainerWrapper");
-
 const left = document.createElement("div");
 left.className = "bloodLeft";
 const right = document.createElement("div");
 right.className = "bloodRight";
-
 wrapper.appendChild(left);
 wrapper.appendChild(right);
 
@@ -179,22 +177,22 @@ for (let i = 1; i <= 300; i++) addBlinkieIfExists(`3 (${i}).gif`);
 for (let i = 1; i <= 300; i++) addBlinkieIfExists(`4 (${i}).gif`);
 
 // =======================
-// 🩸 BLOOD STAIN FULL PAGE (exact sub deget / mouse)
+// 🩸 BLOOD STAIN FULL PAGE + IN CONTAINER
 // =======================
 const stains = ["strop.jpg", "stropp.jpg", "stroppp.jpg"];
 
-function createExactStain(x, y) {
+function createStain(x, y) {
   const s = document.createElement("img");
   s.src = stains[Math.floor(Math.random() * stains.length)];
   s.className = "bloodStain";
 
-  // exact la coordonatele mouse/tap
+  // exact coordonate viewport
   s.style.left = x + "px";
   s.style.top = y + "px";
   s.style.width = (60 + Math.random() * 80) + "px";
   s.style.opacity = 1;
 
-  document.body.appendChild(s);
+  document.body.appendChild(s); // peste tot
 
   setTimeout(() => s.style.opacity = 0, 50);
   setTimeout(() => s.remove(), 2000);
@@ -202,13 +200,13 @@ function createExactStain(x, y) {
 
 // CLICK DESKTOP
 document.addEventListener("click", (e) => {
-  createExactStain(e.clientX, e.clientY);
+  createStain(e.clientX, e.clientY);
 });
 
 // TAP MOBILE
 document.addEventListener("touchstart", (e) => {
   const touch = e.touches[0];
-  createExactStain(touch.clientX, touch.clientY);
+  createStain(touch.clientX, touch.clientY);
 });
 
 // =======================
@@ -221,7 +219,7 @@ function flash(el, fixedColor=false) {
   for (let c of t) {
     const s = document.createElement("span");
     s.textContent = c;
-    if (fixedColor) s.style.color = "#fff"; // alb fix
+    if (fixedColor) s.style.color = "#fff";
     el.appendChild(s);
     spans.push(s);
   }
